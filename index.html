@@ -6898,6 +6898,55 @@
 }
     
 
+    
+    // 1. JSON DATA EMBEDDED
+
+
+    // 2. HELPER: Convert time string to absolute minutes for chronological sorting
+    const timeToMinutes = (timeStr) => {
+        if (!timeStr || timeStr.includes("Included")) return 0;
+        
+        // Handle "12 Noon" specifically
+        let normalizedTime = timeStr.split(' - ')[0].toLowerCase();
+        if (normalizedTime.includes("noon")) normalizedTime = normalizedTime.replace("noon", "pm");
+
+        const [time, modifier] = normalizedTime.split(' ');
+        let [hours, minutes] = time.split('.').map(Number); // Handles "9.55" or "9"
+        if (!minutes) minutes = 0;
+
+        if (hours === 12) {
+            hours = (modifier === 'am') ? 0 : 12;
+        } else if (modifier === 'pm') {
+            hours += 12;
+        }
+        return hours * 60 + minutes;
+    };
+
+    // 3. GLOBAL CLEANING & SORTING: Fixes Lab durations and IK1201 ordering for ALL groups
+    const processAllSchedules = (data) => {
+        Object.keys(data).forEach(group => {
+            // Filter out the "Tutorials Included" meta-row
+            let sessions = data[group].filter(item => item.time && item.course !== "Tutorials Included");
+
+            sessions.forEach(session => {
+                // Standardize Lab Slots to 2 hours and 55 minutes 
+                if (session.room === "LAB SLOT") {
+                    if (session.time.includes("9 AM")) session.time = "9 AM - 11.55 AM";
+                    if (session.time.includes("2 PM")) session.time = "2 PM - 4.55 PM";
+                }
+            });
+
+            // Chronological Sort: Ensures 6 PM (IK1201) is after morning/afternoon classes
+            sessions.sort((a, b) => timeToMinutes(a.time) - timeToMinutes(b.time));
+            
+            data[group] = sessions;
+        });
+    };
+
+    // Run processing once on load
+    processAllSchedules(scheduleData);
+
+    // 4. UI FUNCTIONS
     function handleTyping(val) {
         const suggBox = document.getElementById('suggestions');
         if (val.length < 2) { suggBox.style.display = 'none'; return; }
@@ -6928,6 +6977,7 @@
         weekdays.forEach(day => {
             const isToday = (day === today);
             const classes = timetable.filter(c => c.day === day);
+            
             html += `
                 <div class="day-card ${isToday ? 'is-today' : ''}" id="${day}">
                     <div class="day-header">
@@ -6940,7 +6990,7 @@
                                 <span class="time">${c.time}</span>
                                 <span class="course-name">${c.course}</span>
                                 <span class="room-tag">📍 ${c.room}</span>
-                            </div>`).join('') : '<div style="padding:40px; color:#333; text-align:center;">No lectures today.</div>'}
+                            </div>`).join('') : '<div style="padding:40px; color:#555; text-align:center;">No lectures today.</div>'}
                     </div>
                 </div>`;
         });
@@ -6951,6 +7001,7 @@
             if (todayCard) todayCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }, 150);
     }
+</script>
 </script>
 </body>
 </html>
