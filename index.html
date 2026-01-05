@@ -62,6 +62,20 @@
             outline: none;
         }
 
+        /* Action Buttons */
+        .btn-group { display: flex; gap: 8px; margin-right: 12px; }
+        
+        .btn {
+            padding: 10px 16px; border-radius: 8px; font-weight: 700; 
+            font-size: 0.75rem; cursor: pointer; white-space: nowrap; border: none;
+            display: none; transition: 0.3s;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        .btn-save { background: var(--accent); color: black; }
+        .btn-return { background: #222; color: var(--accent); border: 1px solid var(--accent); }
+        .btn-erase { background: #441111; color: #ff9999; }
+
         #suggestions {
             position: absolute; top: 115%; left: 0; right: 0;
             background: #0f0f0f; border-radius: 12px;
@@ -99,24 +113,21 @@
             z-index: 10;
         }
 
-        /* BOXED CURRENT DAY STYLE */
         .is-today { 
             border: 2px solid var(--accent) !important; 
             background: rgba(212, 175, 55, 0.05); 
-            box-shadow: inset 0 0 15px rgba(212, 175, 55, 0.1); 
         }
 
         .day-header {
             padding: 20px 30px; border-bottom: 1px solid var(--border);
             display: flex; justify-content: space-between; align-items: center;
-            background: rgba(255,255,255,0.01);
         }
 
         .day-header h3 { margin: 0; font-size: 1.1rem; color: var(--accent); font-weight: 700; text-transform: uppercase; }
 
         .status-badge {
             font-size: 0.7rem; padding: 6px 14px; border-radius: 5px;
-            background: #1a1a1a; color: var(--text-dim); font-weight: 800; letter-spacing: 1px;
+            background: #1a1a1a; color: var(--text-dim); font-weight: 800;
         }
 
         .is-today .status-badge { background: var(--accent); color: #000; }
@@ -124,10 +135,8 @@
         .class-row {
             display: grid; grid-template-columns: 180px 1fr 150px;
             padding: 20px 30px; align-items: center;
-            transition: background 0.3s ease;
         }
         
-        .class-row:hover { background: rgba(255,255,255,0.02); }
         .class-row:not(:last-child) { border-bottom: 1px solid var(--border); }
 
         .time { font-weight: 600; color: #fff; font-size: 0.95rem; }
@@ -136,15 +145,12 @@
 
         footer {
             margin-top: auto; padding: 50px; text-align: center;
-            color: var(--accent); 
-            font-size: 1rem; border-top: 1px solid var(--border);
-            font-weight: 500;
+            color: var(--accent); font-size: 1rem; border-top: 1px solid var(--border);
         }
 
         @media (max-width: 768px) {
             .class-row { grid-template-columns: 1fr; gap: 12px; padding: 25px; }
             .room-tag { text-align: left; }
-            .day-card:hover { transform: scale(1.01); }
         }
     </style>
 </head>
@@ -158,7 +164,12 @@
 <div class="main-content">
     <div class="search-wrapper">
         <div class="input-container">
-            <input type="text" id="nameSearch" placeholder="Search your name..." autocomplete="off" oninput="handleTyping(this.value)">
+            <input type="text" id="nameSearch" placeholder="Search name for friend or self..." autocomplete="off" oninput="handleTyping(this.value)">
+            <div class="btn-group">
+                <button id="saveAsMeBtn" class="btn btn-save" onclick="saveAsMe()">SAVE AS ME</button>
+                <button id="returnBtn" class="btn btn-return" onclick="loadSavedProfile()">RETURN TO ME</button>
+                <button id="eraseBtn" class="btn btn-erase" onclick="eraseMe()">RESET</button>
+            </div>
         </div>
         <div id="suggestions"></div>
     </div>
@@ -168,7 +179,8 @@
 <footer>Made with ❤️ by π</footer>
 
 <script>
-    // JSON DATA EMBEDDED DIRECTLY
+    // DATA SECTION
+    // Copy the students array from your original file here
     const students = [
   {
     "name": "Abhirup Dhara",
@@ -4062,80 +4074,68 @@
   }
 ]
 
-    // Placeholder for the full group timetable
+
+    // Copy the full scheduleData JSON here
     const scheduleData = {
     "G1": [
         {
+            "course": "CH1201 TUT",
+            "day": "Monday",
+            "time": "8 - 8.55 AM",
+            "room": "Block 9: 101"
+        },
+        {
             "course": "ME1202",
             "day": "Monday",
             "time": "9 AM - 9.55 AM",
             "room": "CLH: LT003"
         },
         {
-            "course": "IK1201",
-            "day": "Wednesday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "IK1201",
-            "day": "Thursday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        
-        {
-            "course": "CH1201 TUT",
-            "day": "Thursday",
-            "time": "8 AM - 8.55 AM",
-            "room": "101"
-        },
-        {
-            "course": "MA1201 TUT",
-            "day": "Wednesday",
-            "time": "8 AM - 8.55 AM",
-            "room": "101"
-        },
-        {
-            "course": "ME1202",
-            "day": "Wednesday",
-            "time": "9 AM - 9.55 AM",
+            "course": "MA1201",
+            "day": "Monday",
+            "time": "10 AM - 10.55 AM",
             "room": "CLH: LT003"
         },
         {
             "course": "CS1201",
-            "day": "Thursday",
-            "time": "9 AM - 11.55 AM",
+            "day": "Monday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "ME1201",
+            "day": "Monday",
+            "time": "2 PM - 4:55 PM",
             "room": "LAB SLOT"
         },
         {
+            "course": "ME1202 TUT",
+            "day": "Tuesday",
+            "time": "2 - 2.55 PM",
+            "room": "Block 9: 101"
+        },
+        {
             "course": "CH1201",
-            "day": "Friday",
+            "day": "Tuesday",
+            "time": "3 PM - 5:55 PM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "IK1201",
+            "day": "Wednesday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "ME1202",
+            "day": "Wednesday",
             "time": "9 AM - 9.55 AM",
             "room": "CLH: LT003"
         },
         {
             "course": "MA1201",
-            "day": "Monday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
             "day": "Wednesday",
             "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Friday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CS1201",
-            "day": "Monday",
-            "time": "11 AM - 11.55 AM",
             "room": "CLH: LT003"
         },
         {
@@ -4145,10 +4145,22 @@
             "room": "CLH: LT003"
         },
         {
-            "course": "CS1201",
-            "day": "Friday",
-            "time": "11 AM - 11.55 AM",
+            "course": "CH1201",
+            "day": "Wednesday",
+            "time": "3 PM - 3.55 PM",
             "room": "CLH: LT003"
+        },
+        {
+            "course": "IK1201",
+            "day": "Thursday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "CS1201",
+            "day": "Thursday",
+            "time": "9 AM - 11:55 AM",
+            "room": "LAB SLOT"
         },
         {
             "course": "ME1202",
@@ -4157,112 +4169,95 @@
             "room": "CLH: LT103"
         },
         {
-            "course": "ME1201",
-            "day": "Monday",
-            "time": "2 PM - 4.55 PM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "ME 1202 TUT",
-            "day": "Tuesday",
-            "time": "2 PM - 2.55 PM",
-            "room": "101"
-        },
-        {
             "course": "CH1201",
             "day": "Thursday",
             "time": "2 PM - 2.55 PM",
             "room": "CLH: LT003"
         },
         {
-            "course": "CH1201",
-            "day": "Tuesday",
-            "time": "3 PM - 3.55 PM",
-            "room": "LAB SLOT"
+            "course": "MA1201 TUT",
+            "day": "Friday",
+            "time": "8- 8.55 AM",
+            "room": "Block 9: 101"
         },
         {
             "course": "CH1201",
-            "day": "Wednesday",
-            "time": "3 PM - 3.55 PM",
+            "day": "Friday",
+            "time": "9 AM - 9.55 AM",
             "room": "CLH: LT003"
         },
         {
-            "course": "Tutorials Included",
-            "room": "Check Block 9 Mapping"
+            "course": "MA1201",
+            "day": "Friday",
+            "time": "10 AM - 10.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CS1201",
+            "day": "Friday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT003"
         }
     ],
     "G2": [
         {
+            "course": "CH1201 TUT",
+            "day": "Monday",
+            "time": "8 - 8.55 AM",
+            "room": "Block 9: 102"
+        },
+        {
             "course": "ME1202",
             "day": "Monday",
             "time": "9 AM - 9.55 AM",
             "room": "CLH: LT003"
         },
         {
-            "course": "IK1201",
-            "day": "Wednesday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "IK1201",
-            "day": "Thursday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "CH1201 TUT",
-            "day": "Thursday",
-            "time": "8 AM - 8.55 AM",
-            "room": "102"
-        },
-        
-        {
-            "course": "MA1201 TUT",
-            "day": "Wednesday",
-            "time": "8 AM - 8.55 AM",
-            "room": "102"
-        },
-        {
-            "course": "ME1202",
-            "day": "Wednesday",
-            "time": "9 AM - 9.55 AM",
+            "course": "MA1201",
+            "day": "Monday",
+            "time": "10 AM - 10.55 AM",
             "room": "CLH: LT003"
         },
         {
             "course": "CS1201",
-            "day": "Thursday",
-            "time": "9 AM - 9.55 AM",
+            "day": "Monday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "ME1201",
+            "day": "Monday",
+            "time": "2 PM - 4:55 PM",
             "room": "LAB SLOT"
         },
         {
+            "course": "ME1202 TUT",
+            "day": "Tuesday",
+            "time": "2 - 2.55 PM",
+            "room": "Block 9: 102"
+        },
+        {
             "course": "CH1201",
-            "day": "Friday",
+            "day": "Tuesday",
+            "time": "3 PM - 5:55 PM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "IK1201",
+            "day": "Wednesday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "ME1202",
+            "day": "Wednesday",
             "time": "9 AM - 9.55 AM",
             "room": "CLH: LT003"
         },
         {
             "course": "MA1201",
-            "day": "Monday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
             "day": "Wednesday",
             "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Friday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CS1201",
-            "day": "Monday",
-            "time": "11 AM - 11.55 AM",
             "room": "CLH: LT003"
         },
         {
@@ -4272,10 +4267,22 @@
             "room": "CLH: LT003"
         },
         {
-            "course": "CS1201",
-            "day": "Friday",
-            "time": "11 AM - 11.55 AM",
+            "course": "CH1201",
+            "day": "Wednesday",
+            "time": "3 PM - 3.55 PM",
             "room": "CLH: LT003"
+        },
+        {
+            "course": "IK1201",
+            "day": "Thursday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "CS1201",
+            "day": "Thursday",
+            "time": "9 AM - 11:55 AM",
+            "room": "LAB SLOT"
         },
         {
             "course": "ME1202",
@@ -4284,111 +4291,95 @@
             "room": "CLH: LT103"
         },
         {
-            "course": "ME1201",
-            "day": "Monday",
-            "time": "2 PM - 4.55 PM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "ME 1202 TUT",
-            "day": "Tuesday",
-            "time": "2 PM - 2.55 PM",
-            "room": "102"
-        },
-        {
             "course": "CH1201",
             "day": "Thursday",
             "time": "2 PM - 2.55 PM",
             "room": "CLH: LT003"
         },
         {
-            "course": "CH1201",
-            "day": "Tuesday",
-            "time": "3 PM - 3.55 PM",
-            "room": "LAB SLOT"
+            "course": "MA1201 TUT",
+            "day": "Friday",
+            "time": "8- 8.55 AM",
+            "room": "Block 9: 102"
         },
         {
             "course": "CH1201",
-            "day": "Wednesday",
-            "time": "3 PM - 3.55 PM",
+            "day": "Friday",
+            "time": "9 AM - 9.55 AM",
             "room": "CLH: LT003"
         },
         {
-            "course": "Tutorials Included",
-            "room": "Check Block 9 Mapping"
+            "course": "MA1201",
+            "day": "Friday",
+            "time": "10 AM - 10.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CS1201",
+            "day": "Friday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT003"
         }
     ],
     "G3": [
         {
+            "course": "CH1201 TUT",
+            "day": "Monday",
+            "time": "8 - 8.55 AM",
+            "room": "Block 9: 103"
+        },
+        {
             "course": "ME1202",
             "day": "Monday",
             "time": "9 AM - 9.55 AM",
             "room": "CLH: LT003"
         },
         {
-            "course": "IK1201",
-            "day": "Wednesday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "IK1201",
-            "day": "Thursday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "CH1201 TUT",
-            "day": "Thursday",
-            "time": "8 AM - 8.55 AM",
-            "room": "103"
-        },
-        {
-            "course": "MA1201 TUT",
-            "day": "Wednesday",
-            "time": "8 AM - 8.55 AM",
-            "room": "103"
-        },
-        {
-            "course": "ME1202",
-            "day": "Wednesday",
-            "time": "9 AM - 9.55 AM",
+            "course": "MA1201",
+            "day": "Monday",
+            "time": "10 AM - 10.55 AM",
             "room": "CLH: LT003"
         },
         {
             "course": "CS1201",
-            "day": "Thursday",
-            "time": "9 AM - 9.55 AM",
+            "day": "Monday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "ME1201",
+            "day": "Monday",
+            "time": "2 PM - 4:55 PM",
             "room": "LAB SLOT"
         },
         {
+            "course": "ME1202 TUT",
+            "day": "Tuesday",
+            "time": "2 - 2.55 PM",
+            "room": "Block 9: 103"
+        },
+        {
             "course": "CH1201",
-            "day": "Friday",
+            "day": "Tuesday",
+            "time": "3 PM - 5:55 PM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "IK1201",
+            "day": "Wednesday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "ME1202",
+            "day": "Wednesday",
             "time": "9 AM - 9.55 AM",
             "room": "CLH: LT003"
         },
         {
             "course": "MA1201",
-            "day": "Monday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
             "day": "Wednesday",
             "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Friday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CS1201",
-            "day": "Monday",
-            "time": "11 AM - 11.55 AM",
             "room": "CLH: LT003"
         },
         {
@@ -4398,10 +4389,22 @@
             "room": "CLH: LT003"
         },
         {
-            "course": "CS1201",
-            "day": "Friday",
-            "time": "11 AM - 11.55 AM",
+            "course": "CH1201",
+            "day": "Wednesday",
+            "time": "3 PM - 3.55 PM",
             "room": "CLH: LT003"
+        },
+        {
+            "course": "IK1201",
+            "day": "Thursday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "CS1201",
+            "day": "Thursday",
+            "time": "9 AM - 11:55 AM",
+            "room": "LAB SLOT"
         },
         {
             "course": "ME1202",
@@ -4410,86 +4413,46 @@
             "room": "CLH: LT103"
         },
         {
-            "course": "ME1201",
-            "day": "Monday",
-            "time": "2 PM - 4.55 PM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "ME 1202 TUT",
-            "day": "Tuesday",
-            "time": "2 PM - 2.55 PM",
-            "room": "103"
-        },
-        {
             "course": "CH1201",
             "day": "Thursday",
             "time": "2 PM - 2.55 PM",
             "room": "CLH: LT003"
         },
         {
-            "course": "CH1201",
-            "day": "Tuesday",
-            "time": "3 PM - 3.55 PM",
-            "room": "LAB SLOT"
+            "course": "MA1201 TUT",
+            "day": "Friday",
+            "time": "8- 8.55 AM",
+            "room": "Block 9: 103"
         },
         {
             "course": "CH1201",
-            "day": "Wednesday",
-            "time": "3 PM - 3.55 PM",
+            "day": "Friday",
+            "time": "9 AM - 9.55 AM",
             "room": "CLH: LT003"
         },
         {
-            "course": "Tutorials Included",
-            "room": "Check Block 9 Mapping"
+            "course": "MA1201",
+            "day": "Friday",
+            "time": "10 AM - 10.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CS1201",
+            "day": "Friday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT003"
         }
     ],
     "G4": [
         {
-            "course": "ME1202",
-            "day": "Monday",
-            "time": "9 AM - 9.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "IK1201",
-            "day": "Wednesday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "IK1201",
-            "day": "Thursday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
             "course": "CH1201 TUT",
-            "day": "Thursday",
-            "time": "8 AM - 8.55 AM",
-            "room": "104"
-        },
-        {
-            "course": "MA1201 TUT",
-            "day": "Wednesday",
-            "time": "8 AM - 8.55 AM",
-            "room": "104"
+            "day": "Monday",
+            "time": "8 - 8.55 AM",
+            "room": "Block 9: 104"
         },
         {
             "course": "ME1202",
-            "day": "Wednesday",
-            "time": "9 AM - 9.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CS1201",
-            "day": "Thursday",
-            "time": "9 AM - 9.55 AM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "CH1201",
-            "day": "Friday",
+            "day": "Monday",
             "time": "9 AM - 9.55 AM",
             "room": "CLH: LT003"
         },
@@ -4500,64 +4463,46 @@
             "room": "CLH: LT003"
         },
         {
-            "course": "MA1201",
-            "day": "Wednesday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Friday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
             "course": "CS1201",
             "day": "Monday",
             "time": "11 AM - 11.55 AM",
             "room": "CLH: LT003"
         },
         {
-            "course": "CS1201",
-            "day": "Wednesday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CS1201",
-            "day": "Friday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "ME1202",
-            "day": "Thursday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "ME 1202 TUT",
+            "course": "ME1202 TUT",
             "day": "Tuesday",
-            "time": "2 PM - 2.55 PM",
-            "room": "104"
-        },
-        {
-            "course": "CH1201",
-            "day": "Thursday",
-            "time": "2 PM - 2.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CH1201",
-            "day": "Friday",
-            "time": "2 PM - 2.55 PM",
-            "room": "LAB SLOT"
+            "time": "2 - 2.55 PM",
+            "room": "Block 9: 104"
         },
         {
             "course": "ME1201",
             "day": "Tuesday",
-            "time": "3 PM - 5.55 PM",
+            "time": "3 PM - 5:55 PM",
             "room": "LAB SLOT"
+        },
+        {
+            "course": "IK1201",
+            "day": "Wednesday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "ME1202",
+            "day": "Wednesday",
+            "time": "9 AM - 9.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201",
+            "day": "Wednesday",
+            "time": "10 AM - 10.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CS1201",
+            "day": "Wednesday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT003"
         },
         {
             "course": "CH1201",
@@ -4566,74 +4511,76 @@
             "room": "CLH: LT003"
         },
         {
-            "course": "Tutorials Included",
-            "room": "Check Block 9 Mapping"
+            "course": "IK1201",
+            "day": "Thursday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "CS1201",
+            "day": "Thursday",
+            "time": "9 AM - 11:55 AM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "ME1202",
+            "day": "Thursday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "CH1201",
+            "day": "Thursday",
+            "time": "2 PM - 2.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201 TUT",
+            "day": "Friday",
+            "time": "8- 8.55 AM",
+            "room": "Block 9: 104"
+        },
+        {
+            "course": "CH1201",
+            "day": "Friday",
+            "time": "9 AM - 9.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201",
+            "day": "Friday",
+            "time": "10 AM - 10.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CS1201",
+            "day": "Friday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CH1201",
+            "day": "Friday",
+            "time": "2 PM - 4:55 PM",
+            "room": "LAB SLOT"
         }
     ],
     "G5": [
         {
-            "course": "ME1202",
-            "day": "Monday",
-            "time": "9 AM - 9.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "IK1201",
-            "day": "Wednesday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "IK1201",
-            "day": "Thursday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
             "course": "CH1201 TUT",
-            "day": "Thursday",
-            "time": "8 AM - 8.55 AM",
-            "room": "105"
-        },
-        {
-            "course": "MA1201 TUT",
-            "day": "Wednesday",
-            "time": "8 AM - 8.55 AM",
-            "room": "105"
-        },
-        {
-            "course": "CS1201",
-            "day": "Tuesday",
-            "time": "9 AM - 9.55 AM",
-            "room": "LAB SLOT"
+            "day": "Monday",
+            "time": "8 - 8.55 AM",
+            "room": "Block 9: 105"
         },
         {
             "course": "ME1202",
-            "day": "Wednesday",
-            "time": "9 AM - 9.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CH1201",
-            "day": "Friday",
+            "day": "Monday",
             "time": "9 AM - 9.55 AM",
             "room": "CLH: LT003"
         },
         {
             "course": "MA1201",
             "day": "Monday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Wednesday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Friday",
             "time": "10 AM - 10.55 AM",
             "room": "CLH: LT003"
         },
@@ -4645,45 +4592,45 @@
         },
         {
             "course": "CS1201",
-            "day": "Wednesday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CS1201",
-            "day": "Friday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "ME1202",
-            "day": "Thursday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "ME 1202 TUT",
             "day": "Tuesday",
-            "time": "2 PM - 2.55 PM",
-            "room": "105"
-        },
-        {
-            "course": "CH1201",
-            "day": "Thursday",
-            "time": "2 PM - 2.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CH1201",
-            "day": "Friday",
-            "time": "2 PM - 2.55 PM",
+            "time": "9 AM - 11:55 AM",
             "room": "LAB SLOT"
+        },
+        {
+            "course": "ME1202 TUT",
+            "day": "Tuesday",
+            "time": "2 - 2.55 PM",
+            "room": "Block 9: 105"
         },
         {
             "course": "ME1201",
             "day": "Tuesday",
-            "time": "3 PM - 5.55 PM",
+            "time": "3 PM - 5:55 PM",
             "room": "LAB SLOT"
+        },
+        {
+            "course": "IK1201",
+            "day": "Wednesday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "ME1202",
+            "day": "Wednesday",
+            "time": "9 AM - 9.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201",
+            "day": "Wednesday",
+            "time": "10 AM - 10.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CS1201",
+            "day": "Wednesday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT003"
         },
         {
             "course": "CH1201",
@@ -4692,74 +4639,70 @@
             "room": "CLH: LT003"
         },
         {
-            "course": "Tutorials Included",
-            "room": "Check Block 9 Mapping"
+            "course": "IK1201",
+            "day": "Thursday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "ME1202",
+            "day": "Thursday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "CH1201",
+            "day": "Thursday",
+            "time": "2 PM - 2.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201 TUT",
+            "day": "Friday",
+            "time": "8- 8.55 AM",
+            "room": "Block 9: 105"
+        },
+        {
+            "course": "CH1201",
+            "day": "Friday",
+            "time": "9 AM - 9.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201",
+            "day": "Friday",
+            "time": "10 AM - 10.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CS1201",
+            "day": "Friday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CH1201",
+            "day": "Friday",
+            "time": "2 PM - 4:55 PM",
+            "room": "LAB SLOT"
         }
     ],
     "G6": [
         {
-            "course": "ME1202",
-            "day": "Monday",
-            "time": "9 AM - 9.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "IK1201",
-            "day": "Wednesday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "IK1201",
-            "day": "Thursday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
             "course": "CH1201 TUT",
-            "day": "Thursday",
-            "time": "8 AM - 8.55 AM",
-            "room": "106"
-        },
-        {
-            "course": "MA1201 TUT",
-            "day": "Wednesday",
-            "time": "8 AM - 8.55 AM",
-            "room": "106"
-        },
-        {
-            "course": "CS1201",
-            "day": "Tuesday",
-            "time": "9 AM - 9.55 AM",
-            "room": "LAB SLOT"
+            "day": "Monday",
+            "time": "8 - 8.55 AM",
+            "room": "Block 9: 106"
         },
         {
             "course": "ME1202",
-            "day": "Wednesday",
-            "time": "9 AM - 9.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CH1201",
-            "day": "Friday",
+            "day": "Monday",
             "time": "9 AM - 9.55 AM",
             "room": "CLH: LT003"
         },
         {
             "course": "MA1201",
             "day": "Monday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Wednesday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Friday",
             "time": "10 AM - 10.55 AM",
             "room": "CLH: LT003"
         },
@@ -4771,45 +4714,45 @@
         },
         {
             "course": "CS1201",
-            "day": "Wednesday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CS1201",
-            "day": "Friday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "ME1202",
-            "day": "Thursday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "ME 1202 TUT",
             "day": "Tuesday",
-            "time": "2 PM - 2.55 PM",
-            "room": "106"
-        },
-        {
-            "course": "CH1201",
-            "day": "Thursday",
-            "time": "2 PM - 2.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CH1201",
-            "day": "Friday",
-            "time": "2 PM - 2.55 PM",
+            "time": "9 AM - 11:55 AM",
             "room": "LAB SLOT"
+        },
+        {
+            "course": "ME1202 TUT",
+            "day": "Tuesday",
+            "time": "2 - 2.55 PM",
+            "room": "Block 9: 106"
         },
         {
             "course": "ME1201",
             "day": "Tuesday",
-            "time": "3 PM - 5.55 PM",
+            "time": "3 PM - 5:55 PM",
             "room": "LAB SLOT"
+        },
+        {
+            "course": "IK1201",
+            "day": "Wednesday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "ME1202",
+            "day": "Wednesday",
+            "time": "9 AM - 9.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201",
+            "day": "Wednesday",
+            "time": "10 AM - 10.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CS1201",
+            "day": "Wednesday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT003"
         },
         {
             "course": "CH1201",
@@ -4818,46 +4761,60 @@
             "room": "CLH: LT003"
         },
         {
-            "course": "Tutorials Included",
-            "room": "Check Block 9 Mapping"
+            "course": "IK1201",
+            "day": "Thursday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "ME1202",
+            "day": "Thursday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "CH1201",
+            "day": "Thursday",
+            "time": "2 PM - 2.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201 TUT",
+            "day": "Friday",
+            "time": "8- 8.55 AM",
+            "room": "Block 9: 106"
+        },
+        {
+            "course": "CH1201",
+            "day": "Friday",
+            "time": "9 AM - 9.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201",
+            "day": "Friday",
+            "time": "10 AM - 10.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CS1201",
+            "day": "Friday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CH1201",
+            "day": "Friday",
+            "time": "2 PM - 4:55 PM",
+            "room": "LAB SLOT"
         }
     ],
     "G7": [
         {
-            "course": "CS1201",
-            "day": "Tuesday",
-            "time": "9 AM - 9.55 AM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "IK1201",
-            "day": "Wednesday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "IK1201",
-            "day": "Thursday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
             "course": "CH1201 TUT",
-            "day": "Thursday",
-            "time": "8 AM - 8.55 AM",
-            "room": "107"
-        },
-        {
-            "course": "MA1201 TUT",
-            "day": "Wednesday",
-            "time": "8 AM - 8.55 AM",
-            "room": "107"
-        },
-        {
-            "course": "ME1202",
-            "day": "Thursday",
-            "time": "9 AM - 9.55 AM",
-            "room": "CLH: LT003"
+            "day": "Monday",
+            "time": "8 - 8.55 AM",
+            "room": "Block 9: 107"
         },
         {
             "course": "MA1201",
@@ -4866,38 +4823,8 @@
             "room": "CLH: LT003"
         },
         {
-            "course": "MA1201",
-            "day": "Wednesday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CH1201",
-            "day": "Thursday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Friday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
             "course": "CS1201",
             "day": "Monday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CS1201",
-            "day": "Wednesday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CS1201",
-            "day": "Friday",
             "time": "11 AM - 11.55 AM",
             "room": "CLH: LT003"
         },
@@ -4908,28 +4835,46 @@
             "room": "CLH: LT003"
         },
         {
-            "course": "ME1202",
-            "day": "Friday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
             "course": "CH1201",
             "day": "Monday",
-            "time": "2 PM - 2.55 PM",
+            "time": "2 PM - 4:55 PM",
             "room": "LAB SLOT"
         },
         {
-            "course": "ME 1202 TUT",
+            "course": "CS1201",
             "day": "Tuesday",
-            "time": "2 PM - 2.55 PM",
-            "room": "107"
+            "time": "9 AM - 11:55 AM",
+            "room": "LAB SLOT"
         },
         {
-            "course": "ME1201",
-            "day": "Thursday",
-            "time": "2 PM - 4.55 PM",
-            "room": "LAB SLOT"
+            "course": "ME1202",
+            "day": "Tuesday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "ME1202 TUT",
+            "day": "Tuesday",
+            "time": "2 - 2.55 PM",
+            "room": "Block 9: 107"
+        },
+        {
+            "course": "IK1201",
+            "day": "Wednesday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "MA1201",
+            "day": "Wednesday",
+            "time": "10 AM - 10.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CS1201",
+            "day": "Wednesday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT003"
         },
         {
             "course": "CH1201",
@@ -4938,52 +4883,60 @@
             "room": "CLH: LT103"
         },
         {
+            "course": "IK1201",
+            "day": "Thursday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "ME1202",
+            "day": "Thursday",
+            "time": "9 AM - 9.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CH1201",
+            "day": "Thursday",
+            "time": "10 AM - 10.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "ME1201",
+            "day": "Thursday",
+            "time": "2 PM - 4:55 PM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "MA1201 TUT",
+            "day": "Friday",
+            "time": "8- 8.55 AM",
+            "room": "Block 9: 107"
+        },
+        {
+            "course": "MA1201",
+            "day": "Friday",
+            "time": "10 AM - 10.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CS1201",
+            "day": "Friday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
             "course": "CH1201",
             "day": "Friday",
             "time": "5 PM - 5.55 PM",
             "room": "CLH: LT103"
-        },
-        {
-            "course": "Tutorials Included",
-            "room": "Check Block 9 Mapping"
         }
     ],
     "G8": [
         {
-            "course": "CS1201",
-            "day": "Tuesday",
-            "time": "9 AM - 9.55 AM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "IK1201",
-            "day": "Wednesday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "IK1201",
-            "day": "Thursday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
             "course": "CH1201 TUT",
-            "day": "Thursday",
-            "time": "8 AM - 8.55 AM",
-            "room": "108"
-        },
-        {
-            "course": "MA1201 TUT",
-            "day": "Wednesday",
-            "time": "8 AM - 8.55 AM",
-            "room": "108"
-        },
-        {
-            "course": "ME1202",
-            "day": "Thursday",
-            "time": "9 AM - 9.55 AM",
-            "room": "CLH: LT003"
+            "day": "Monday",
+            "time": "8 - 8.55 AM",
+            "room": "Block 9: 108"
         },
         {
             "course": "MA1201",
@@ -4992,38 +4945,8 @@
             "room": "CLH: LT003"
         },
         {
-            "course": "MA1201",
-            "day": "Wednesday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CH1201",
-            "day": "Thursday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Friday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
             "course": "CS1201",
             "day": "Monday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CS1201",
-            "day": "Wednesday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CS1201",
-            "day": "Friday",
             "time": "11 AM - 11.55 AM",
             "room": "CLH: LT003"
         },
@@ -5034,28 +4957,46 @@
             "room": "CLH: LT003"
         },
         {
-            "course": "ME1202",
-            "day": "Friday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
             "course": "CH1201",
             "day": "Monday",
-            "time": "2 PM - 2.55 PM",
+            "time": "2 PM - 4:55 PM",
             "room": "LAB SLOT"
         },
         {
-            "course": "ME 1202 TUT",
+            "course": "CS1201",
             "day": "Tuesday",
-            "time": "2 PM - 2.55 PM",
-            "room": "108"
+            "time": "9 AM - 11:55 AM",
+            "room": "LAB SLOT"
         },
         {
-            "course": "ME1201",
-            "day": "Thursday",
-            "time": "2 PM - 4.55 PM",
-            "room": "LAB SLOT"
+            "course": "ME1202",
+            "day": "Tuesday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "ME1202 TUT",
+            "day": "Tuesday",
+            "time": "2 - 2.55 PM",
+            "room": "Block 9: 108"
+        },
+        {
+            "course": "IK1201",
+            "day": "Wednesday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "MA1201",
+            "day": "Wednesday",
+            "time": "10 AM - 10.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CS1201",
+            "day": "Wednesday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT003"
         },
         {
             "course": "CH1201",
@@ -5064,62 +5005,82 @@
             "room": "CLH: LT103"
         },
         {
+            "course": "IK1201",
+            "day": "Thursday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "ME1202",
+            "day": "Thursday",
+            "time": "9 AM - 9.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CH1201",
+            "day": "Thursday",
+            "time": "10 AM - 10.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "ME1201",
+            "day": "Thursday",
+            "time": "2 PM - 4:55 PM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "MA1201 TUT",
+            "day": "Friday",
+            "time": "8- 8.55 AM",
+            "room": "Block 9: 108"
+        },
+        {
+            "course": "MA1201",
+            "day": "Friday",
+            "time": "10 AM - 10.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CS1201",
+            "day": "Friday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
             "course": "CH1201",
             "day": "Friday",
             "time": "5 PM - 5.55 PM",
             "room": "CLH: LT103"
-        },
-        {
-            "course": "Tutorials Included",
-            "room": "Check Block 9 Mapping"
         }
     ],
     "G9": [
         {
-            "course": "CS1201",
-            "day": "Wednesday",
-            "time": "9 AM - 9.55 AM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "IK1201",
-            "day": "Wednesday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "IK1201",
-            "day": "Thursday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
             "course": "CH1201 TUT",
-            "day": "Thursday",
-            "time": "8 AM - 8.55 AM",
-            "room": "109"
-        },
-        {
-            "course": "MA1201 TUT",
-            "day": "Wednesday",
-            "time": "8 AM - 8.55 AM",
-            "room": "109"
+            "day": "Monday",
+            "time": "8 - 8.55 AM",
+            "room": "Block 9: 109"
         },
         {
             "course": "ME1202",
-            "day": "Thursday",
-            "time": "9 AM - 9.55 AM",
+            "day": "Monday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CH1201",
+            "day": "Monday",
+            "time": "2 PM - 4:55 PM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "CS1201",
+            "day": "Monday",
+            "time": "5 PM - 5.55 PM",
             "room": "CLH: LT003"
         },
         {
             "course": "MA1201",
             "day": "Tuesday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CH1201",
-            "day": "Thursday",
             "time": "10 AM - 10.55 AM",
             "room": "CLH: LT003"
         },
@@ -5131,9 +5092,27 @@
         },
         {
             "course": "ME1202",
-            "day": "Monday",
+            "day": "Tuesday",
             "time": "12 Noon - 12.55 PM",
             "room": "CLH: LT003"
+        },
+        {
+            "course": "ME1202 TUT",
+            "day": "Tuesday",
+            "time": "2 - 2.55 PM",
+            "room": "Block 9: 109"
+        },
+        {
+            "course": "IK1201",
+            "day": "Wednesday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "CS1201",
+            "day": "Wednesday",
+            "time": "9 AM - 11:55 AM",
+            "room": "LAB SLOT"
         },
         {
             "course": "MA1201",
@@ -5142,28 +5121,40 @@
             "room": "CLH: LT003"
         },
         {
+            "course": "CH1201",
+            "day": "Wednesday",
+            "time": "4 PM - 4.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "IK1201",
+            "day": "Thursday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
             "course": "ME1202",
-            "day": "Friday",
-            "time": "12 Noon - 12.55 PM",
+            "day": "Thursday",
+            "time": "9 AM - 9.55 AM",
             "room": "CLH: LT003"
         },
         {
             "course": "CH1201",
-            "day": "Monday",
-            "time": "2 PM - 2.55 PM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "ME 1202 TUT",
-            "day": "Tuesday",
-            "time": "2 PM - 2.55 PM",
-            "room": "109"
+            "day": "Thursday",
+            "time": "10 AM - 10.55 AM",
+            "room": "CLH: LT003"
         },
         {
             "course": "ME1201",
             "day": "Thursday",
-            "time": "2 PM - 4.55 PM",
+            "time": "2 PM - 4:55 PM",
             "room": "LAB SLOT"
+        },
+        {
+            "course": "MA1201 TUT",
+            "day": "Friday",
+            "time": "8- 8.55 AM",
+            "room": "Block 9: 109"
         },
         {
             "course": "CS1201",
@@ -5172,92 +5163,46 @@
             "room": "CLH: LT003"
         },
         {
-            "course": "CH1201",
-            "day": "Wednesday",
-            "time": "4 PM - 4.55 PM",
-            "room": "CLH: LT103"
-        },
-        {
             "course": "MA1201",
             "day": "Friday",
             "time": "4 PM - 4.55 PM",
             "room": "CLH: LT003"
         },
         {
-            "course": "CS1201",
-            "day": "Monday",
-            "time": "5 PM - 5.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
             "course": "CH1201",
             "day": "Friday",
             "time": "5 PM - 5.55 PM",
             "room": "CLH: LT103"
-        },
-        {
-            "course": "Tutorials Included",
-            "room": "Check Block 9 Mapping"
         }
     ],
     "G10": [
         {
+            "course": "CH1201 TUT",
+            "day": "Monday",
+            "time": "8 - 8.55 AM",
+            "room": "Block 9: 110"
+        },
+        {
             "course": "ME1201",
             "day": "Monday",
-            "time": "9 AM - 11.55 AM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "IK1201",
-            "day": "Wednesday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "IK1201",
-            "day": "Thursday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "CH1201 TUT",
-            "day": "Thursday",
-            "time": "8 AM - 8.55 AM",
-            "room": "110"
-        },
-        {
-            "course": "MA1201 TUT",
-            "day": "Wednesday",
-            "time": "8 AM - 8.55 AM",
-            "room": "110"
-        },
-        {
-            "course": "CS1201",
-            "day": "Wednesday",
-            "time": "9 AM - 9.55 AM",
+            "time": "9 AM - 11:55 AM",
             "room": "LAB SLOT"
         },
         {
             "course": "ME1202",
-            "day": "Thursday",
-            "time": "9 AM - 9.55 AM",
+            "day": "Monday",
+            "time": "12 Noon - 12.55 PM",
             "room": "CLH: LT003"
         },
         {
-            "course": "CH1201",
-            "day": "Friday",
-            "time": "9 AM - 9.55 AM",
-            "room": "LAB SLOT"
+            "course": "CS1201",
+            "day": "Monday",
+            "time": "5 PM - 5.55 PM",
+            "room": "CLH: LT003"
         },
         {
             "course": "MA1201",
             "day": "Tuesday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CH1201",
-            "day": "Thursday",
             "time": "10 AM - 10.55 AM",
             "room": "CLH: LT003"
         },
@@ -5269,9 +5214,27 @@
         },
         {
             "course": "ME1202",
-            "day": "Monday",
+            "day": "Tuesday",
             "time": "12 Noon - 12.55 PM",
             "room": "CLH: LT003"
+        },
+        {
+            "course": "ME1202 TUT",
+            "day": "Tuesday",
+            "time": "2 - 2.55 PM",
+            "room": "Block 9: 110"
+        },
+        {
+            "course": "IK1201",
+            "day": "Wednesday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "CS1201",
+            "day": "Wednesday",
+            "time": "9 AM - 11:55 AM",
+            "room": "LAB SLOT"
         },
         {
             "course": "MA1201",
@@ -5280,16 +5243,40 @@
             "room": "CLH: LT003"
         },
         {
+            "course": "CH1201",
+            "day": "Wednesday",
+            "time": "4 PM - 4.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "IK1201",
+            "day": "Thursday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
             "course": "ME1202",
-            "day": "Friday",
-            "time": "12 Noon - 12.55 PM",
+            "day": "Thursday",
+            "time": "9 AM - 9.55 AM",
             "room": "CLH: LT003"
         },
         {
-            "course": "ME 1202 TUT",
-            "day": "Tuesday",
-            "time": "2 PM - 2.55 PM",
-            "room": "110"
+            "course": "CH1201",
+            "day": "Thursday",
+            "time": "10 AM - 10.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201 TUT",
+            "day": "Friday",
+            "time": "8- 8.55 AM",
+            "room": "Block 9: 110"
+        },
+        {
+            "course": "CH1201",
+            "day": "Friday",
+            "time": "9 AM - 11:55 AM",
+            "room": "LAB SLOT"
         },
         {
             "course": "CS1201",
@@ -5298,92 +5285,46 @@
             "room": "CLH: LT003"
         },
         {
-            "course": "CH1201",
-            "day": "Wednesday",
-            "time": "4 PM - 4.55 PM",
-            "room": "CLH: LT103"
-        },
-        {
             "course": "MA1201",
             "day": "Friday",
             "time": "4 PM - 4.55 PM",
             "room": "CLH: LT003"
         },
         {
-            "course": "CS1201",
-            "day": "Monday",
-            "time": "5 PM - 5.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
             "course": "CH1201",
             "day": "Friday",
             "time": "5 PM - 5.55 PM",
             "room": "CLH: LT103"
-        },
-        {
-            "course": "Tutorials Included",
-            "room": "Check Block 9 Mapping"
         }
     ],
     "G11": [
         {
+            "course": "CH1201 TUT",
+            "day": "Monday",
+            "time": "8 - 8.55 AM",
+            "room": "Block 9: 205"
+        },
+        {
             "course": "ME1201",
             "day": "Monday",
-            "time": "9 AM - 11.55 AM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "IK1201",
-            "day": "Wednesday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "IK1201",
-            "day": "Thursday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "CH1201 TUT",
-            "day": "Thursday",
-            "time": "8 AM - 8.55 AM",
-            "room": "205"
-        },
-        {
-            "course": "MA1201 TUT",
-            "day": "Wednesday",
-            "time": "8 AM - 8.55 AM",
-            "room": "205"
-        },
-        {
-            "course": "CS1201",
-            "day": "Wednesday",
-            "time": "9 AM - 9.55 AM",
+            "time": "9 AM - 11:55 AM",
             "room": "LAB SLOT"
         },
         {
             "course": "ME1202",
-            "day": "Thursday",
-            "time": "9 AM - 9.55 AM",
+            "day": "Monday",
+            "time": "12 Noon - 12.55 PM",
             "room": "CLH: LT003"
         },
         {
-            "course": "CH1201",
-            "day": "Friday",
-            "time": "9 AM - 9.55 AM",
-            "room": "LAB SLOT"
+            "course": "CS1201",
+            "day": "Monday",
+            "time": "5 PM - 5.55 PM",
+            "room": "CLH: LT003"
         },
         {
             "course": "MA1201",
             "day": "Tuesday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CH1201",
-            "day": "Thursday",
             "time": "10 AM - 10.55 AM",
             "room": "CLH: LT003"
         },
@@ -5395,9 +5336,27 @@
         },
         {
             "course": "ME1202",
-            "day": "Monday",
+            "day": "Tuesday",
             "time": "12 Noon - 12.55 PM",
             "room": "CLH: LT003"
+        },
+        {
+            "course": "ME1202 TUT",
+            "day": "Tuesday",
+            "time": "2 - 2.55 PM",
+            "room": "Block 9: 205"
+        },
+        {
+            "course": "IK1201",
+            "day": "Wednesday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "CS1201",
+            "day": "Wednesday",
+            "time": "9 AM - 11:55 AM",
+            "room": "LAB SLOT"
         },
         {
             "course": "MA1201",
@@ -5406,16 +5365,40 @@
             "room": "CLH: LT003"
         },
         {
+            "course": "CH1201",
+            "day": "Wednesday",
+            "time": "4 PM - 4.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "IK1201",
+            "day": "Thursday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
             "course": "ME1202",
-            "day": "Friday",
-            "time": "12 Noon - 12.55 PM",
+            "day": "Thursday",
+            "time": "9 AM - 9.55 AM",
             "room": "CLH: LT003"
         },
         {
-            "course": "ME 1202 TUT",
-            "day": "Tuesday",
-            "time": "2 PM - 2.55 PM",
-            "room": "205"
+            "course": "CH1201",
+            "day": "Thursday",
+            "time": "10 AM - 10.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201 TUT",
+            "day": "Friday",
+            "time": "8- 8.55 AM",
+            "room": "Block 9: 205"
+        },
+        {
+            "course": "CH1201",
+            "day": "Friday",
+            "time": "9 AM - 11:55 AM",
+            "room": "LAB SLOT"
         },
         {
             "course": "CS1201",
@@ -5424,92 +5407,46 @@
             "room": "CLH: LT003"
         },
         {
-            "course": "CH1201",
-            "day": "Wednesday",
-            "time": "4 PM - 4.55 PM",
-            "room": "CLH: LT103"
-        },
-        {
             "course": "MA1201",
             "day": "Friday",
             "time": "4 PM - 4.55 PM",
             "room": "CLH: LT003"
         },
         {
-            "course": "CS1201",
-            "day": "Monday",
-            "time": "5 PM - 5.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
             "course": "CH1201",
             "day": "Friday",
             "time": "5 PM - 5.55 PM",
             "room": "CLH: LT103"
-        },
-        {
-            "course": "Tutorials Included",
-            "room": "Check Block 9 Mapping"
         }
     ],
     "G12": [
         {
+            "course": "CH1201 TUT",
+            "day": "Monday",
+            "time": "8 - 8.55 AM",
+            "room": "Block 9: 301"
+        },
+        {
             "course": "ME1201",
             "day": "Monday",
-            "time": "9 AM - 11.55 AM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "IK1201",
-            "day": "Wednesday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "IK1201",
-            "day": "Thursday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "CH1201 TUT",
-            "day": "Thursday",
-            "time": "8 AM - 8.55 AM",
-            "room": "301"
-        },
-        {
-            "course": "MA1201 TUT",
-            "day": "Wednesday",
-            "time": "8 AM - 8.55 AM",
-            "room": "301"
-        },
-        {
-            "course": "CS1201",
-            "day": "Wednesday",
-            "time": "9 AM - 9.55 AM",
+            "time": "9 AM - 11:55 AM",
             "room": "LAB SLOT"
         },
         {
             "course": "ME1202",
-            "day": "Thursday",
-            "time": "9 AM - 9.55 AM",
+            "day": "Monday",
+            "time": "12 Noon - 12.55 PM",
             "room": "CLH: LT003"
         },
         {
-            "course": "CH1201",
-            "day": "Friday",
-            "time": "9 AM - 9.55 AM",
-            "room": "LAB SLOT"
+            "course": "CS1201",
+            "day": "Monday",
+            "time": "5 PM - 5.55 PM",
+            "room": "CLH: LT003"
         },
         {
             "course": "MA1201",
             "day": "Tuesday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CH1201",
-            "day": "Thursday",
             "time": "10 AM - 10.55 AM",
             "room": "CLH: LT003"
         },
@@ -5521,9 +5458,27 @@
         },
         {
             "course": "ME1202",
-            "day": "Monday",
+            "day": "Tuesday",
             "time": "12 Noon - 12.55 PM",
             "room": "CLH: LT003"
+        },
+        {
+            "course": "ME1202 TUT",
+            "day": "Tuesday",
+            "time": "2 - 2.55 PM",
+            "room": "Block 9: 301"
+        },
+        {
+            "course": "IK1201",
+            "day": "Wednesday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "CS1201",
+            "day": "Wednesday",
+            "time": "9 AM - 11:55 AM",
+            "room": "LAB SLOT"
         },
         {
             "course": "MA1201",
@@ -5532,16 +5487,40 @@
             "room": "CLH: LT003"
         },
         {
+            "course": "CH1201",
+            "day": "Wednesday",
+            "time": "4 PM - 4.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "IK1201",
+            "day": "Thursday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
             "course": "ME1202",
-            "day": "Friday",
-            "time": "12 Noon - 12.55 PM",
+            "day": "Thursday",
+            "time": "9 AM - 9.55 AM",
             "room": "CLH: LT003"
         },
         {
-            "course": "ME 1202 TUT",
-            "day": "Tuesday",
-            "time": "2 PM - 2.55 PM",
-            "room": "301"
+            "course": "CH1201",
+            "day": "Thursday",
+            "time": "10 AM - 10.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201 TUT",
+            "day": "Friday",
+            "time": "8- 8.55 AM",
+            "room": "Block 9: 301"
+        },
+        {
+            "course": "CH1201",
+            "day": "Friday",
+            "time": "9 AM - 11:55 AM",
+            "room": "LAB SLOT"
         },
         {
             "course": "CS1201",
@@ -5550,64 +5529,24 @@
             "room": "CLH: LT003"
         },
         {
-            "course": "CH1201",
-            "day": "Wednesday",
-            "time": "4 PM - 4.55 PM",
-            "room": "CLH: LT103"
-        },
-        {
             "course": "MA1201",
             "day": "Friday",
             "time": "4 PM - 4.55 PM",
             "room": "CLH: LT003"
         },
         {
-            "course": "CS1201",
-            "day": "Monday",
-            "time": "5 PM - 5.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
             "course": "CH1201",
             "day": "Friday",
             "time": "5 PM - 5.55 PM",
             "room": "CLH: LT103"
-        },
-        {
-            "course": "Tutorials Included",
-            "room": "Check Block 9 Mapping"
         }
     ],
     "G13": [
         {
-            "course": "PH1201",
-            "day": "Thursday",
-            "time": "9 AM - 9.55 AM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "IK1201",
-            "day": "Wednesday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "IK1201",
-            "day": "Thursday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
             "course": "PH1201 TUT",
-            "day": "Thursday",
-            "time": "8 AM - 8.55 AM",
-            "room": "302"
-        },
-        {
-            "course": "MA1201 TUT",
-            "day": "Wednesday",
-            "time": "8 AM - 8.55 AM",
-            "room": "302"
+            "day": "Monday",
+            "time": "8 - 8.55 AM",
+            "room": "Block 9: 302"
         },
         {
             "course": "PH1201",
@@ -5616,76 +5555,106 @@
             "room": "CLH: LT103"
         },
         {
+            "course": "CE1201",
+            "day": "Monday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "EE1201",
+            "day": "Monday",
+            "time": "2 PM - 4:55 PM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "CS1201",
+            "day": "Monday",
+            "time": "5 PM - 5.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
             "course": "MA1201",
             "day": "Tuesday",
             "time": "10 AM - 10.55 AM",
             "room": "CLH: LT003"
         },
         {
+            "course": "CS1201",
+            "day": "Tuesday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "EE1201",
+            "day": "Tuesday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "CE1201",
+            "day": "Tuesday",
+            "time": "2 PM - 2.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "IK1201",
+            "day": "Wednesday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
             "course": "PH1201",
             "day": "Wednesday",
             "time": "10 AM - 10.55 AM",
             "room": "CLH: LT103"
+        },
+        {
+            "course": "EE1201",
+            "day": "Wednesday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "MA1201",
+            "day": "Wednesday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CS1201",
+            "day": "Wednesday",
+            "time": "2 PM - 4:55 PM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "IK1201",
+            "day": "Thursday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "PH1201",
+            "day": "Thursday",
+            "time": "9 AM - 11:55 AM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "EE1201",
+            "day": "Thursday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201 TUT",
+            "day": "Friday",
+            "time": "8- 8.55 AM",
+            "room": "Block 9: 302"
         },
         {
             "course": "PH1201",
             "day": "Friday",
             "time": "10 AM - 10.55 AM",
             "room": "CLH: LT103"
-        },
-        {
-            "course": "CE1201",
-            "day": "Monday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "CS1201",
-            "day": "Tuesday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "EE1201",
-            "day": "Wednesday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "EE1201",
-            "day": "Tuesday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "MA1201",
-            "day": "Wednesday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "EE1201",
-            "day": "Thursday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "EE1201",
-            "day": "Monday",
-            "time": "2 PM - 2.55 PM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "CE1201",
-            "day": "Tuesday",
-            "time": "2 PM - 4.55 PM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "CS1201",
-            "day": "Wednesday",
-            "time": "2 PM - 2.55 PM",
-            "room": "LAB SLOT"
         },
         {
             "course": "CS1201",
@@ -5698,48 +5667,14 @@
             "day": "Friday",
             "time": "4 PM - 4.55 PM",
             "room": "CLH: LT003"
-        },
-        {
-            "course": "CS1201",
-            "day": "Monday",
-            "time": "5 PM - 5.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "Tutorials Included",
-            "room": "Check Block 9 Mapping"
         }
     ],
     "G14": [
         {
-            "course": "PH1201",
-            "day": "Thursday",
-            "time": "9 AM - 9.55 AM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "IK1201",
-            "day": "Wednesday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "IK1201",
-            "day": "Thursday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
             "course": "PH1201 TUT",
-            "day": "Thursday",
-            "time": "8 AM - 8.55 AM",
-            "room": "303"
-        },
-        {
-            "course": "MA1201 TUT",
-            "day": "Wednesday",
-            "time": "8 AM - 8.55 AM",
-            "room": "303"
+            "day": "Monday",
+            "time": "8 - 8.55 AM",
+            "room": "Block 9: 303"
         },
         {
             "course": "PH1201",
@@ -5748,76 +5683,106 @@
             "room": "CLH: LT103"
         },
         {
+            "course": "CE1201",
+            "day": "Monday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "EE1201",
+            "day": "Monday",
+            "time": "2 PM - 4:55 PM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "CS1201",
+            "day": "Monday",
+            "time": "5 PM - 5.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
             "course": "MA1201",
             "day": "Tuesday",
             "time": "10 AM - 10.55 AM",
             "room": "CLH: LT003"
         },
         {
+            "course": "CS1201",
+            "day": "Tuesday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "EE1201",
+            "day": "Tuesday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "CE1201",
+            "day": "Tuesday",
+            "time": "2 PM - 2.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "IK1201",
+            "day": "Wednesday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
             "course": "PH1201",
             "day": "Wednesday",
             "time": "10 AM - 10.55 AM",
             "room": "CLH: LT103"
+        },
+        {
+            "course": "EE1201",
+            "day": "Wednesday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "MA1201",
+            "day": "Wednesday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CS1201",
+            "day": "Wednesday",
+            "time": "2 PM - 4:55 PM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "IK1201",
+            "day": "Thursday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "PH1201",
+            "day": "Thursday",
+            "time": "9 AM - 11:55 AM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "EE1201",
+            "day": "Thursday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201 TUT",
+            "day": "Friday",
+            "time": "8- 8.55 AM",
+            "room": "Block 9: 303"
         },
         {
             "course": "PH1201",
             "day": "Friday",
             "time": "10 AM - 10.55 AM",
             "room": "CLH: LT103"
-        },
-        {
-            "course": "CE1201",
-            "day": "Monday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "CS1201",
-            "day": "Tuesday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "EE1201",
-            "day": "Wednesday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "EE1201",
-            "day": "Tuesday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "MA1201",
-            "day": "Wednesday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "EE1201",
-            "day": "Thursday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "EE1201",
-            "day": "Monday",
-            "time": "2 PM - 2.55 PM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "CE1201",
-            "day": "Tuesday",
-            "time": "2 PM - 4.55 PM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "CS1201",
-            "day": "Wednesday",
-            "time": "2 PM - 2.55 PM",
-            "room": "LAB SLOT"
         },
         {
             "course": "CS1201",
@@ -5830,48 +5795,38 @@
             "day": "Friday",
             "time": "4 PM - 4.55 PM",
             "room": "CLH: LT003"
-        },
-        {
-            "course": "CS1201",
-            "day": "Monday",
-            "time": "5 PM - 5.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "Tutorials Included",
-            "room": "Check Block 9 Mapping"
         }
     ],
     "G15": [
         {
+            "course": "PH1201 TUT",
+            "day": "Monday",
+            "time": "8 - 8.55 AM",
+            "room": "Block 9: 304"
+        },
+        {
             "course": "PH1201",
             "day": "Monday",
             "time": "10 AM - 10.55 AM",
             "room": "CLH: LT103"
         },
         {
-            "course": "IK1201",
-            "day": "Wednesday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
+            "course": "CE1201",
+            "day": "Monday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT103"
         },
         {
-            "course": "IK1201",
-            "day": "Thursday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
+            "course": "EE1201",
+            "day": "Monday",
+            "time": "2 PM - 4:55 PM",
+            "room": "LAB SLOT"
         },
         {
-            "course": "PH1201 TUT",
-            "day": "Thursday",
-            "time": "8 AM - 8.55 AM",
-            "room": "304"
-        },
-        {
-            "course": "MA1201 TUT",
-            "day": "Wednesday",
-            "time": "8 AM - 8.55 AM",
-            "room": "304"
+            "course": "CS1201",
+            "day": "Monday",
+            "time": "5 PM - 5.55 PM",
+            "room": "CLH: LT003"
         },
         {
             "course": "MA1201",
@@ -5880,76 +5835,82 @@
             "room": "CLH: LT003"
         },
         {
+            "course": "CS1201",
+            "day": "Tuesday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "EE1201",
+            "day": "Tuesday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "CE1201",
+            "day": "Tuesday",
+            "time": "2 PM - 2.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "IK1201",
+            "day": "Wednesday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
             "course": "PH1201",
             "day": "Wednesday",
             "time": "10 AM - 10.55 AM",
             "room": "CLH: LT103"
+        },
+        {
+            "course": "EE1201",
+            "day": "Wednesday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "MA1201",
+            "day": "Wednesday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CS1201",
+            "day": "Wednesday",
+            "time": "2 PM - 4:55 PM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "IK1201",
+            "day": "Thursday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "EE1201",
+            "day": "Thursday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "PH1201",
+            "day": "Thursday",
+            "time": "2 PM - 4:55 PM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "MA1201 TUT",
+            "day": "Friday",
+            "time": "8- 8.55 AM",
+            "room": "Block 9: 304"
         },
         {
             "course": "PH1201",
             "day": "Friday",
             "time": "10 AM - 10.55 AM",
             "room": "CLH: LT103"
-        },
-        {
-            "course": "CE1201",
-            "day": "Monday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "CS1201",
-            "day": "Tuesday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "EE1201",
-            "day": "Wednesday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "EE1201",
-            "day": "Tuesday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "MA1201",
-            "day": "Wednesday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "EE1201",
-            "day": "Thursday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "EE1201",
-            "day": "Monday",
-            "time": "2 PM - 2.55 PM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "CE1201",
-            "day": "Tuesday",
-            "time": "2 PM - 4.55 PM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "CS1201",
-            "day": "Wednesday",
-            "time": "2 PM - 2.55 PM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "PH1201",
-            "day": "Thursday",
-            "time": "2 PM - 2.55 PM",
-            "room": "LAB SLOT"
         },
         {
             "course": "CS1201",
@@ -5962,48 +5923,14 @@
             "day": "Friday",
             "time": "4 PM - 4.55 PM",
             "room": "CLH: LT003"
-        },
-        {
-            "course": "CS1201",
-            "day": "Monday",
-            "time": "5 PM - 5.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "Tutorials Included",
-            "room": "Check Block 9 Mapping"
         }
     ],
     "G16": [
         {
-            "course": "EE1201",
-            "day": "Thursday",
-            "time": "9 AM - 9.55 AM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "IK1201",
-            "day": "Wednesday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "IK1201",
-            "day": "Thursday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
             "course": "PH1201 TUT",
-            "day": "Thursday",
-            "time": "8 AM - 8.55 AM",
-            "room": "305"
-        },
-        {
-            "course": "MA1201 TUT",
-            "day": "Wednesday",
-            "time": "8 AM - 8.55 AM",
-            "room": "305"
+            "day": "Monday",
+            "time": "8 - 8.55 AM",
+            "room": "Block 9: 305"
         },
         {
             "course": "PH1201",
@@ -6012,76 +5939,106 @@
             "room": "CLH: LT103"
         },
         {
+            "course": "CE1201",
+            "day": "Monday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "CS1201",
+            "day": "Monday",
+            "time": "5 PM - 5.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
             "course": "MA1201",
             "day": "Tuesday",
             "time": "10 AM - 10.55 AM",
             "room": "CLH: LT003"
         },
         {
+            "course": "CS1201",
+            "day": "Tuesday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "EE1201",
+            "day": "Tuesday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "CE1201",
+            "day": "Tuesday",
+            "time": "2 PM - 2.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "IK1201",
+            "day": "Wednesday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
             "course": "PH1201",
             "day": "Wednesday",
             "time": "10 AM - 10.55 AM",
             "room": "CLH: LT103"
+        },
+        {
+            "course": "EE1201",
+            "day": "Wednesday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "MA1201",
+            "day": "Wednesday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CS1201",
+            "day": "Wednesday",
+            "time": "2 PM - 4:55 PM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "IK1201",
+            "day": "Thursday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "EE1201",
+            "day": "Thursday",
+            "time": "9 AM - 11:55 AM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "EE1201",
+            "day": "Thursday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "PH1201",
+            "day": "Thursday",
+            "time": "2 PM - 4:55 PM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "MA1201 TUT",
+            "day": "Friday",
+            "time": "8- 8.55 AM",
+            "room": "Block 9: 305"
         },
         {
             "course": "PH1201",
             "day": "Friday",
             "time": "10 AM - 10.55 AM",
             "room": "CLH: LT103"
-        },
-        {
-            "course": "CE1201",
-            "day": "Monday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "CS1201",
-            "day": "Tuesday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "EE1201",
-            "day": "Wednesday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "EE1201",
-            "day": "Tuesday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "MA1201",
-            "day": "Wednesday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "EE1201",
-            "day": "Thursday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CE1201",
-            "day": "Tuesday",
-            "time": "2 PM - 4.55 PM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "CS1201",
-            "day": "Wednesday",
-            "time": "2 PM - 2.55 PM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "PH1201",
-            "day": "Thursday",
-            "time": "2 PM - 2.55 PM",
-            "room": "LAB SLOT"
         },
         {
             "course": "CS1201",
@@ -6094,54 +6051,14 @@
             "day": "Friday",
             "time": "4 PM - 4.55 PM",
             "room": "CLH: LT003"
-        },
-        {
-            "course": "CS1201",
-            "day": "Monday",
-            "time": "5 PM - 5.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "Tutorials Included",
-            "room": "Check Block 9 Mapping"
         }
     ],
     "G17": [
         {
-            "course": "PH1201",
-            "day": "Tuesday",
-            "time": "9 AM - 9.55 AM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "IK1201",
-            "day": "Wednesday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "IK1201",
-            "day": "Thursday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
             "course": "PH1201 TUT",
-            "day": "Thursday",
-            "time": "8 AM - 8.55 AM",
-            "room": "306"
-        },
-        {
-            "course": "MA1201 TUT",
-            "day": "Wednesday",
-            "time": "8 AM - 8.55 AM",
-            "room": "306"
-        },
-        {
-            "course": "EE1201",
-            "day": "Thursday",
-            "time": "9 AM - 9.55 AM",
-            "room": "LAB SLOT"
+            "day": "Monday",
+            "time": "8 - 8.55 AM",
+            "room": "Block 9: 306"
         },
         {
             "course": "PH1201",
@@ -6150,82 +6067,40 @@
             "room": "CLH: LT103"
         },
         {
-            "course": "PH1201",
-            "day": "Wednesday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "PH1201",
-            "day": "Friday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
             "course": "CE1201",
             "day": "Monday",
             "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "EE1201",
-            "day": "Wednesday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "EE1201",
-            "day": "Tuesday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "EE1201",
-            "day": "Thursday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CE1201",
-            "day": "Tuesday",
-            "time": "2 PM - 4.55 PM",
             "room": "CLH: LT103"
         },
         {
             "course": "CS1201",
-            "day": "Friday",
+            "day": "Monday",
+            "time": "3 PM - 3.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201",
+            "day": "Monday",
+            "time": "4 PM - 4.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "PH1201",
+            "day": "Tuesday",
+            "time": "9 AM - 11:55 AM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "EE1201",
+            "day": "Tuesday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "CE1201",
+            "day": "Tuesday",
             "time": "2 PM - 2.55 PM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "CS1201",
-            "day": "Monday",
-            "time": "3 PM - 3.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CS1201",
-            "day": "Thursday",
-            "time": "3 PM - 3.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Monday",
-            "time": "4 PM - 4.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Wednesday",
-            "time": "4 PM - 4.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Thursday",
-            "time": "4 PM - 4.55 PM",
-            "room": "CLH: LT003"
+            "room": "CLH: LT103"
         },
         {
             "course": "CS1201",
@@ -6234,46 +6109,84 @@
             "room": "CLH: LT103"
         },
         {
-            "course": "Tutorials Included",
-            "room": "Check Block 9 Mapping"
+            "course": "IK1201",
+            "day": "Wednesday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "PH1201",
+            "day": "Wednesday",
+            "time": "10 AM - 10.55 AM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "EE1201",
+            "day": "Wednesday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "MA1201",
+            "day": "Wednesday",
+            "time": "4 PM - 4.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "IK1201",
+            "day": "Thursday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "EE1201",
+            "day": "Thursday",
+            "time": "9 AM - 11:55 AM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "EE1201",
+            "day": "Thursday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CS1201",
+            "day": "Thursday",
+            "time": "3 PM - 3.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201",
+            "day": "Thursday",
+            "time": "4 PM - 4.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201 TUT",
+            "day": "Friday",
+            "time": "8- 8.55 AM",
+            "room": "Block 9: 306"
+        },
+        {
+            "course": "PH1201",
+            "day": "Friday",
+            "time": "10 AM - 10.55 AM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "CS1201",
+            "day": "Friday",
+            "time": "2 PM - 4:55 PM",
+            "room": "LAB SLOT"
         }
     ],
     "G18": [
         {
-            "course": "PH1201",
-            "day": "Tuesday",
-            "time": "9 AM - 9.55 AM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "IK1201",
-            "day": "Wednesday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "IK1201",
-            "day": "Thursday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
             "course": "PH1201 TUT",
-            "day": "Thursday",
-            "time": "8 AM - 8.55 AM",
-            "room": "307"
-        },
-        {
-            "course": "MA1201 TUT",
-            "day": "Wednesday",
-            "time": "8 AM - 8.55 AM",
-            "room": "307"
-        },
-        {
-            "course": "EE1201",
-            "day": "Thursday",
-            "time": "9 AM - 9.55 AM",
-            "room": "LAB SLOT"
+            "day": "Monday",
+            "time": "8 - 8.55 AM",
+            "room": "Block 9: 307"
         },
         {
             "course": "PH1201",
@@ -6282,82 +6195,40 @@
             "room": "CLH: LT103"
         },
         {
-            "course": "PH1201",
-            "day": "Wednesday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "PH1201",
-            "day": "Friday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
             "course": "CE1201",
             "day": "Monday",
             "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "EE1201",
-            "day": "Wednesday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "EE1201",
-            "day": "Tuesday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "EE1201",
-            "day": "Thursday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CE1201",
-            "day": "Tuesday",
-            "time": "2 PM - 4.55 PM",
             "room": "CLH: LT103"
         },
         {
             "course": "CS1201",
-            "day": "Friday",
+            "day": "Monday",
+            "time": "3 PM - 3.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201",
+            "day": "Monday",
+            "time": "4 PM - 4.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "PH1201",
+            "day": "Tuesday",
+            "time": "9 AM - 11:55 AM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "EE1201",
+            "day": "Tuesday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "CE1201",
+            "day": "Tuesday",
             "time": "2 PM - 2.55 PM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "CS1201",
-            "day": "Monday",
-            "time": "3 PM - 3.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CS1201",
-            "day": "Thursday",
-            "time": "3 PM - 3.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Monday",
-            "time": "4 PM - 4.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Wednesday",
-            "time": "4 PM - 4.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Thursday",
-            "time": "4 PM - 4.55 PM",
-            "room": "CLH: LT003"
+            "room": "CLH: LT103"
         },
         {
             "course": "CS1201",
@@ -6366,63 +6237,96 @@
             "room": "CLH: LT103"
         },
         {
-            "course": "Tutorials Included",
-            "room": "Check Block 9 Mapping"
+            "course": "IK1201",
+            "day": "Wednesday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "PH1201",
+            "day": "Wednesday",
+            "time": "10 AM - 10.55 AM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "EE1201",
+            "day": "Wednesday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "MA1201",
+            "day": "Wednesday",
+            "time": "4 PM - 4.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "IK1201",
+            "day": "Thursday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "EE1201",
+            "day": "Thursday",
+            "time": "9 AM - 11:55 AM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "EE1201",
+            "day": "Thursday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CS1201",
+            "day": "Thursday",
+            "time": "3 PM - 3.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201",
+            "day": "Thursday",
+            "time": "4 PM - 4.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201 TUT",
+            "day": "Friday",
+            "time": "8- 8.55 AM",
+            "room": "Block 9: 307"
+        },
+        {
+            "course": "PH1201",
+            "day": "Friday",
+            "time": "10 AM - 10.55 AM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "CS1201",
+            "day": "Friday",
+            "time": "2 PM - 4:55 PM",
+            "room": "LAB SLOT"
         }
     ],
     "G19": [
         {
-            "course": "PH1201",
+            "course": "CE1201",
             "day": "Monday",
-            "time": "9 AM - 9.55 AM",
-            "room": "LAB SLOT"
-        },{
-            "course": "IK1201",
-            "day": "Wednesday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "IK1201",
-            "day": "Thursday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003"
         },
         {
             "course": "PH1201 TUT",
-            "day": "Thursday",
-            "time": "8 AM - 8.55 AM",
-            "room": "308"
+            "day": "Monday",
+            "time": "8 - 8.55 AM",
+            "room": "Block 9: 308"
         },
         {
-            "course": "MA1201 TUT",
-            "day": "Wednesday",
-            "time": "8 AM - 8.55 AM",
-            "room": "308"
-        },
-        {
-            "course": "EE1201",
-            "day": "Friday",
-            "time": "9 AM - 9.55 AM",
+            "course": "PH1201",
+            "day": "Monday",
+            "time": "9 AM - 11:55 AM",
             "room": "LAB SLOT"
-        },
-        {
-            "course": "CE1201",
-            "day": "Tuesday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "EE1201",
-            "day": "Tuesday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "EE1201",
-            "day": "Thursday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT003"
         },
         {
             "course": "PH1201",
@@ -6431,63 +6335,27 @@
             "room": "CLH: LT103"
         },
         {
-            "course": "EE1201",
-            "day": "Wednesday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT103"
+            "course": "CS1201",
+            "day": "Monday",
+            "time": "3 PM - 3.55 PM",
+            "room": "CLH: LT003"
         },
         {
-            "course": "PH1201",
-            "day": "Friday",
-            "time": "12 Noon - 12.55 PM",
+            "course": "MA1201",
+            "day": "Monday",
+            "time": "4 PM - 4.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "EE1201",
+            "day": "Tuesday",
+            "time": "11 AM - 11.55 AM",
             "room": "CLH: LT103"
         },
         {
             "course": "CE1201",
             "day": "Tuesday",
-            "time": "2 PM - 4.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CS1201",
-            "day": "Friday",
             "time": "2 PM - 2.55 PM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "CS1201",
-            "day": "Monday",
-            "time": "3 PM - 3.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "PH1201",
-            "day": "Wednesday",
-            "time": "3 PM - 3.55 PM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "CS1201",
-            "day": "Thursday",
-            "time": "3 PM - 3.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Monday",
-            "time": "4 PM - 4.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Wednesday",
-            "time": "4 PM - 4.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Thursday",
-            "time": "4 PM - 4.55 PM",
             "room": "CLH: LT003"
         },
         {
@@ -6497,64 +6365,96 @@
             "room": "CLH: LT103"
         },
         {
-            "course": "Tutorials Included",
-            "room": "Check Block 9 Mapping"
+            "course": "IK1201",
+            "day": "Wednesday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "EE1201",
+            "day": "Wednesday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "PH1201",
+            "day": "Wednesday",
+            "time": "3 PM - 3.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "MA1201",
+            "day": "Wednesday",
+            "time": "4 PM - 4.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "IK1201",
+            "day": "Thursday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "EE1201",
+            "day": "Thursday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CS1201",
+            "day": "Thursday",
+            "time": "3 PM - 3.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201",
+            "day": "Thursday",
+            "time": "4 PM - 4.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201 TUT",
+            "day": "Friday",
+            "time": "8- 8.55 AM",
+            "room": "Block 9: 308"
+        },
+        {
+            "course": "EE1201",
+            "day": "Friday",
+            "time": "9 AM - 11:55 AM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "PH1201",
+            "day": "Friday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "CS1201",
+            "day": "Friday",
+            "time": "2 PM - 4:55 PM",
+            "room": "LAB SLOT"
         }
     ],
     "G20": [
         {
-            "course": "PH1201",
+            "course": "CE1201",
             "day": "Monday",
-            "time": "9 AM - 9.55 AM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "IK1201",
-            "day": "Wednesday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "IK1201",
-            "day": "Thursday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003"
         },
         {
             "course": "PH1201 TUT",
-            "day": "Thursday",
-            "time": "8 AM - 8.55 AM",
-            "room": "309"
+            "day": "Monday",
+            "time": "8 - 8.55 AM",
+            "room": "Block 9: 309"
         },
         {
-            "course": "MA1201 TUT",
-            "day": "Wednesday",
-            "time": "8 AM - 8.55 AM",
-            "room": "309"
-        },
-        {
-            "course": "EE1201",
-            "day": "Friday",
-            "time": "9 AM - 9.55 AM",
+            "course": "PH1201",
+            "day": "Monday",
+            "time": "9 AM - 11:55 AM",
             "room": "LAB SLOT"
-        },
-        {
-            "course": "CE1201",
-            "day": "Tuesday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "EE1201",
-            "day": "Tuesday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "EE1201",
-            "day": "Thursday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT003"
         },
         {
             "course": "PH1201",
@@ -6563,63 +6463,27 @@
             "room": "CLH: LT103"
         },
         {
-            "course": "EE1201",
-            "day": "Wednesday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT103"
+            "course": "CS1201",
+            "day": "Monday",
+            "time": "3 PM - 3.55 PM",
+            "room": "CLH: LT003"
         },
         {
-            "course": "PH1201",
-            "day": "Friday",
-            "time": "12 Noon - 12.55 PM",
+            "course": "MA1201",
+            "day": "Monday",
+            "time": "4 PM - 4.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "EE1201",
+            "day": "Tuesday",
+            "time": "11 AM - 11.55 AM",
             "room": "CLH: LT103"
         },
         {
             "course": "CE1201",
             "day": "Tuesday",
-            "time": "2 PM - 4.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "CS1201",
-            "day": "Friday",
             "time": "2 PM - 2.55 PM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "CS1201",
-            "day": "Monday",
-            "time": "3 PM - 3.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "PH1201",
-            "day": "Wednesday",
-            "time": "3 PM - 3.55 PM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "CS1201",
-            "day": "Thursday",
-            "time": "3 PM - 3.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Monday",
-            "time": "4 PM - 4.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Wednesday",
-            "time": "4 PM - 4.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Thursday",
-            "time": "4 PM - 4.55 PM",
             "room": "CLH: LT003"
         },
         {
@@ -6629,94 +6493,102 @@
             "room": "CLH: LT103"
         },
         {
-            "course": "Tutorials Included",
-            "room": "Check Block 9 Mapping"
+            "course": "IK1201",
+            "day": "Wednesday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "EE1201",
+            "day": "Wednesday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "PH1201",
+            "day": "Wednesday",
+            "time": "3 PM - 3.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "MA1201",
+            "day": "Wednesday",
+            "time": "4 PM - 4.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "IK1201",
+            "day": "Thursday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "EE1201",
+            "day": "Thursday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CS1201",
+            "day": "Thursday",
+            "time": "3 PM - 3.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201",
+            "day": "Thursday",
+            "time": "4 PM - 4.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201 TUT",
+            "day": "Friday",
+            "time": "8- 8.55 AM",
+            "room": "Block 9: 309"
+        },
+        {
+            "course": "EE1201",
+            "day": "Friday",
+            "time": "9 AM - 11:55 AM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "PH1201",
+            "day": "Friday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "CS1201",
+            "day": "Friday",
+            "time": "2 PM - 4:55 PM",
+            "room": "LAB SLOT"
         }
     ],
     "G21": [
         {
-            "course": "CS1201",
+            "course": "CE1201",
             "day": "Monday",
-            "time": "9 AM - 9.55 AM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "IK1201",
-            "day": "Wednesday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "IK1201",
-            "day": "Thursday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003"
         },
         {
             "course": "PH1201 TUT",
-            "day": "Thursday",
-            "time": "8 AM - 8.55 AM",
-            "room": "310"
+            "day": "Monday",
+            "time": "8 - 8.55 AM",
+            "room": "Block 9: 310"
         },
         {
-            "course": "MA1201 TUT",
-            "day": "Wednesday",
-            "time": "8 AM - 8.55 AM",
-            "room": "310"
-        },
-        {
-            "course": "PH1201",
-            "day": "Wednesday",
-            "time": "9 AM - 9.55 AM",
+            "course": "CS1201",
+            "day": "Monday",
+            "time": "9 AM - 11:55 AM",
             "room": "LAB SLOT"
-        },
-        {
-            "course": "EE1201",
-            "day": "Friday",
-            "time": "9 AM - 9.55 AM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "CE1201",
-            "day": "Tuesday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "EE1201",
-            "day": "Tuesday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "EE1201",
-            "day": "Thursday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT003"
         },
         {
             "course": "PH1201",
             "day": "Monday",
             "time": "12 Noon - 12.55 PM",
             "room": "CLH: LT103"
-        },
-        {
-            "course": "EE1201",
-            "day": "Wednesday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "PH1201",
-            "day": "Friday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "CE1201",
-            "day": "Tuesday",
-            "time": "2 PM - 4.55 PM",
-            "room": "CLH: LT003"
         },
         {
             "course": "CS1201",
@@ -6725,33 +6597,21 @@
             "room": "CLH: LT003"
         },
         {
-            "course": "PH1201",
-            "day": "Wednesday",
-            "time": "3 PM - 3.55 PM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "CS1201",
-            "day": "Thursday",
-            "time": "3 PM - 3.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
             "course": "MA1201",
             "day": "Monday",
             "time": "4 PM - 4.55 PM",
             "room": "CLH: LT003"
         },
         {
-            "course": "MA1201",
-            "day": "Wednesday",
-            "time": "4 PM - 4.55 PM",
-            "room": "CLH: LT003"
+            "course": "EE1201",
+            "day": "Tuesday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT103"
         },
         {
-            "course": "MA1201",
-            "day": "Thursday",
-            "time": "4 PM - 4.55 PM",
+            "course": "CE1201",
+            "day": "Tuesday",
+            "time": "2 PM - 2.55 PM",
             "room": "CLH: LT003"
         },
         {
@@ -6761,65 +6621,96 @@
             "room": "CLH: LT103"
         },
         {
-            "course": "Tutorials Included",
-            "room": "Check Block 9 Mapping"
+            "course": "IK1201",
+            "day": "Wednesday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "PH1201",
+            "day": "Wednesday",
+            "time": "9 AM - 11:55 AM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "EE1201",
+            "day": "Wednesday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "PH1201",
+            "day": "Wednesday",
+            "time": "3 PM - 3.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "MA1201",
+            "day": "Wednesday",
+            "time": "4 PM - 4.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "IK1201",
+            "day": "Thursday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "EE1201",
+            "day": "Thursday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CS1201",
+            "day": "Thursday",
+            "time": "3 PM - 3.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201",
+            "day": "Thursday",
+            "time": "4 PM - 4.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201 TUT",
+            "day": "Friday",
+            "time": "8- 8.55 AM",
+            "room": "Block 9: 310"
+        },
+        {
+            "course": "EE1201",
+            "day": "Friday",
+            "time": "9 AM - 11:55 AM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "PH1201",
+            "day": "Friday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT103"
         }
     ],
     "G22": [
         {
-            "course": "CS1201",
+            "course": "CE1201",
             "day": "Monday",
-            "time": "9 AM - 9.55 AM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "IK1201",
-            "day": "Wednesday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "IK1201",
-            "day": "Thursday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003"
         },
         {
             "course": "PH1201 TUT",
-            "day": "Thursday",
-            "time": "8 AM - 8.55 AM",
-            "room": "409"
+            "day": "Monday",
+            "time": "8 - 8.55 AM",
+            "room": "Block 9: 409"
         },
         {
-            "course": "MA1201 TUT",
-            "day": "Wednesday",
-            "time": "8 AM - 8.55 AM",
-            "room": "409"
-        },
-
-        {
-            "course": "PH1201",
-            "day": "Wednesday",
-            "time": "9 AM - 9.55 AM",
+            "course": "CS1201",
+            "day": "Monday",
+            "time": "9 AM - 11:55 AM",
             "room": "LAB SLOT"
-        },
-        {
-            "course": "CE1201",
-            "day": "Tuesday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "EE1201",
-            "day": "Tuesday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "EE1201",
-            "day": "Thursday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT003"
         },
         {
             "course": "PH1201",
@@ -6828,63 +6719,27 @@
             "room": "CLH: LT103"
         },
         {
-            "course": "EE1201",
-            "day": "Wednesday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT103"
+            "course": "CS1201",
+            "day": "Monday",
+            "time": "3 PM - 3.55 PM",
+            "room": "CLH: LT003"
         },
         {
-            "course": "PH1201",
-            "day": "Friday",
-            "time": "12 Noon - 12.55 PM",
+            "course": "MA1201",
+            "day": "Monday",
+            "time": "4 PM - 4.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "EE1201",
+            "day": "Tuesday",
+            "time": "11 AM - 11.55 AM",
             "room": "CLH: LT103"
         },
         {
             "course": "CE1201",
             "day": "Tuesday",
-            "time": "2 PM - 4.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "EE1201",
-            "day": "Friday",
             "time": "2 PM - 2.55 PM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "CS1201",
-            "day": "Monday",
-            "time": "3 PM - 3.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "PH1201",
-            "day": "Wednesday",
-            "time": "3 PM - 3.55 PM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "CS1201",
-            "day": "Thursday",
-            "time": "3 PM - 3.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Monday",
-            "time": "4 PM - 4.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Wednesday",
-            "time": "4 PM - 4.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Thursday",
-            "time": "4 PM - 4.55 PM",
             "room": "CLH: LT003"
         },
         {
@@ -6894,64 +6749,96 @@
             "room": "CLH: LT103"
         },
         {
-            "course": "Tutorials Included",
-            "room": "Check Block 9 Mapping"
+            "course": "IK1201",
+            "day": "Wednesday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "PH1201",
+            "day": "Wednesday",
+            "time": "9 AM - 11:55 AM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "EE1201",
+            "day": "Wednesday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "PH1201",
+            "day": "Wednesday",
+            "time": "3 PM - 3.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "MA1201",
+            "day": "Wednesday",
+            "time": "4 PM - 4.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "IK1201",
+            "day": "Thursday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "EE1201",
+            "day": "Thursday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CS1201",
+            "day": "Thursday",
+            "time": "3 PM - 3.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201",
+            "day": "Thursday",
+            "time": "4 PM - 4.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201 TUT",
+            "day": "Friday",
+            "time": "8- 8.55 AM",
+            "room": "Block 9: 409"
+        },
+        {
+            "course": "PH1201",
+            "day": "Friday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "EE1201",
+            "day": "Friday",
+            "time": "2 PM - 4:55 PM",
+            "room": "LAB SLOT"
         }
     ],
     "G23": [
         {
-            "course": "CS1201",
+            "course": "CE1201",
             "day": "Monday",
-            "time": "9 AM - 9.55 AM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "IK1201",
-            "day": "Wednesday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "IK1201",
-            "day": "Thursday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003"
         },
         {
             "course": "PH1201 TUT",
-            "day": "Thursday",
-            "time": "8 AM - 8.55 AM",
-            "room": "501"
+            "day": "Monday",
+            "time": "8 - 8.55 AM",
+            "room": "Block 9: 501"
         },
         {
-            "course": "MA1201 TUT",
-            "day": "Wednesday",
-            "time": "8 AM - 8.55 AM",
-            "room": "501"
-        },
-        {
-            "course": "PH1201",
-            "day": "Friday",
-            "time": "9 AM - 9.55 AM",
+            "course": "CS1201",
+            "day": "Monday",
+            "time": "9 AM - 11:55 AM",
             "room": "LAB SLOT"
-        },
-        {
-            "course": "CE1201",
-            "day": "Tuesday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "EE1201",
-            "day": "Tuesday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "EE1201",
-            "day": "Thursday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT003"
         },
         {
             "course": "PH1201",
@@ -6960,63 +6847,27 @@
             "room": "CLH: LT103"
         },
         {
-            "course": "EE1201",
-            "day": "Wednesday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT103"
+            "course": "CS1201",
+            "day": "Monday",
+            "time": "3 PM - 3.55 PM",
+            "room": "CLH: LT003"
         },
         {
-            "course": "PH1201",
-            "day": "Friday",
-            "time": "12 Noon - 12.55 PM",
+            "course": "MA1201",
+            "day": "Monday",
+            "time": "4 PM - 4.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "EE1201",
+            "day": "Tuesday",
+            "time": "11 AM - 11.55 AM",
             "room": "CLH: LT103"
         },
         {
             "course": "CE1201",
             "day": "Tuesday",
-            "time": "2 PM - 4.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "EE1201",
-            "day": "Friday",
             "time": "2 PM - 2.55 PM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "CS1201",
-            "day": "Monday",
-            "time": "3 PM - 3.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "PH1201",
-            "day": "Wednesday",
-            "time": "3 PM - 3.55 PM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "CS1201",
-            "day": "Thursday",
-            "time": "3 PM - 3.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Monday",
-            "time": "4 PM - 4.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Wednesday",
-            "time": "4 PM - 4.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Thursday",
-            "time": "4 PM - 4.55 PM",
             "room": "CLH: LT003"
         },
         {
@@ -7026,64 +6877,96 @@
             "room": "CLH: LT103"
         },
         {
-            "course": "Tutorials Included",
-            "room": "Check Block 9 Mapping"
+            "course": "IK1201",
+            "day": "Wednesday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "EE1201",
+            "day": "Wednesday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "PH1201",
+            "day": "Wednesday",
+            "time": "3 PM - 3.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "MA1201",
+            "day": "Wednesday",
+            "time": "4 PM - 4.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "IK1201",
+            "day": "Thursday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "EE1201",
+            "day": "Thursday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CS1201",
+            "day": "Thursday",
+            "time": "3 PM - 3.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201",
+            "day": "Thursday",
+            "time": "4 PM - 4.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201 TUT",
+            "day": "Friday",
+            "time": "8- 8.55 AM",
+            "room": "Block 9: 501"
+        },
+        {
+            "course": "PH1201",
+            "day": "Friday",
+            "time": "9 AM - 11:55 AM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "PH1201",
+            "day": "Friday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "EE1201",
+            "day": "Friday",
+            "time": "2 PM - 4:55 PM",
+            "room": "LAB SLOT"
         }
     ],
     "G24": [
         {
-            "course": "CS1201",
+            "course": "CE1201",
             "day": "Monday",
-            "time": "9 AM - 9.55 AM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "IK1201",
-            "day": "Wednesday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
-        },
-        {
-            "course": "IK1201",
-            "day": "Thursday",
-            "time": "6 PM - 7.30 PM",
-            "room": "CLH: LT003/LT103"
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003"
         },
         {
             "course": "PH1201 TUT",
-            "day": "Thursday",
-            "time": "8 AM - 8.55 AM",
-            "room": "502"
+            "day": "Monday",
+            "time": "8 - 8.55 AM",
+            "room": "Block 9: 502"
         },
         {
-            "course": "MA1201 TUT",
-            "day": "Wednesday",
-            "time": "8 AM - 8.55 AM",
-            "room": "502"
-        },
-        {
-            "course": "PH1201",
-            "day": "Friday",
-            "time": "9 AM - 9.55 AM",
+            "course": "CS1201",
+            "day": "Monday",
+            "time": "9 AM - 11:55 AM",
             "room": "LAB SLOT"
-        },
-        {
-            "course": "CE1201",
-            "day": "Tuesday",
-            "time": "10 AM - 10.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "EE1201",
-            "day": "Tuesday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "EE1201",
-            "day": "Thursday",
-            "time": "11 AM - 11.55 AM",
-            "room": "CLH: LT003"
         },
         {
             "course": "PH1201",
@@ -7092,63 +6975,27 @@
             "room": "CLH: LT103"
         },
         {
-            "course": "EE1201",
-            "day": "Wednesday",
-            "time": "12 Noon - 12.55 PM",
-            "room": "CLH: LT103"
+            "course": "CS1201",
+            "day": "Monday",
+            "time": "3 PM - 3.55 PM",
+            "room": "CLH: LT003"
         },
         {
-            "course": "PH1201",
-            "day": "Friday",
-            "time": "12 Noon - 12.55 PM",
+            "course": "MA1201",
+            "day": "Monday",
+            "time": "4 PM - 4.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "EE1201",
+            "day": "Tuesday",
+            "time": "11 AM - 11.55 AM",
             "room": "CLH: LT103"
         },
         {
             "course": "CE1201",
             "day": "Tuesday",
-            "time": "2 PM - 4.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "EE1201",
-            "day": "Friday",
             "time": "2 PM - 2.55 PM",
-            "room": "LAB SLOT"
-        },
-        {
-            "course": "CS1201",
-            "day": "Monday",
-            "time": "3 PM - 3.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "PH1201",
-            "day": "Wednesday",
-            "time": "3 PM - 3.55 PM",
-            "room": "CLH: LT103"
-        },
-        {
-            "course": "CS1201",
-            "day": "Thursday",
-            "time": "3 PM - 3.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Monday",
-            "time": "4 PM - 4.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Wednesday",
-            "time": "4 PM - 4.55 PM",
-            "room": "CLH: LT003"
-        },
-        {
-            "course": "MA1201",
-            "day": "Thursday",
-            "time": "4 PM - 4.55 PM",
             "room": "CLH: LT003"
         },
         {
@@ -7158,95 +7005,154 @@
             "room": "CLH: LT103"
         },
         {
-            "course": "Tutorials Included",
-            "room": "Check Block 9 Mapping"
+            "course": "IK1201",
+            "day": "Wednesday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "EE1201",
+            "day": "Wednesday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "PH1201",
+            "day": "Wednesday",
+            "time": "3 PM - 3.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "MA1201",
+            "day": "Wednesday",
+            "time": "4 PM - 4.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "IK1201",
+            "day": "Thursday",
+            "time": "8 AM - 8.55 AM",
+            "room": "CLH: LT003/LT103"
+        },
+        {
+            "course": "EE1201",
+            "day": "Thursday",
+            "time": "11 AM - 11.55 AM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "CS1201",
+            "day": "Thursday",
+            "time": "3 PM - 3.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201",
+            "day": "Thursday",
+            "time": "4 PM - 4.55 PM",
+            "room": "CLH: LT003"
+        },
+        {
+            "course": "MA1201 TUT",
+            "day": "Friday",
+            "time": "8- 8.55 AM",
+            "room": "Block 9: 502"
+        },
+        {
+            "course": "PH1201",
+            "day": "Friday",
+            "time": "9 AM - 11:55 AM",
+            "room": "LAB SLOT"
+        },
+        {
+            "course": "PH1201",
+            "day": "Friday",
+            "time": "12 Noon - 12.55 PM",
+            "room": "CLH: LT103"
+        },
+        {
+            "course": "EE1201",
+            "day": "Friday",
+            "time": "2 PM - 4:55 PM",
+            "room": "LAB SLOT"
         }
     ]
 }
-    
+    let currentViewing = null;
 
-    
-    // 1. JSON DATA EMBEDDED
-
-
-    // 2. HELPER: Convert time string to absolute minutes for chronological sorting
-    const timeToMinutes = (timeStr) => {
-        if (!timeStr || timeStr.includes("Included")) return 0;
-        
-        // Handle "12 Noon" specifically
-        let normalizedTime = timeStr.split(' - ')[0].toLowerCase();
-        if (normalizedTime.includes("noon")) normalizedTime = normalizedTime.replace("noon", "pm");
-
-        const [time, modifier] = normalizedTime.split(' ');
-        let [hours, minutes] = time.split('.').map(Number); // Handles "9.55" or "9"
-        if (!minutes) minutes = 0;
-
-        if (hours === 12) {
-            hours = (modifier === 'am') ? 0 : 12;
-        } else if (modifier === 'pm') {
-            hours += 12;
-        }
-        return hours * 60 + minutes;
-    };
-
-    // 3. GLOBAL CLEANING & SORTING: Fixes Lab durations and IK1201 ordering for ALL groups
-    const processAllSchedules = (data) => {
-        Object.keys(data).forEach(group => {
-            // Filter out the "Tutorials Included" meta-row
-            let sessions = data[group].filter(item => item.time && item.course !== "Tutorials Included");
-
-            sessions.forEach(session => {
-                // Standardize Lab Slots to 2 hours and 55 minutes 
-                if (session.room === "LAB SLOT") {
-                    if (session.time.includes("9 AM")) session.time = "9 AM - 11.55 AM";
-                    if (session.time.includes("2 PM")) session.time = "2 PM - 4.55 PM";
-                }
-            });
-
-            // Chronological Sort: Ensures 6 PM (IK1201) is after morning/afternoon classes
-            sessions.sort((a, b) => timeToMinutes(a.time) - timeToMinutes(b.time));
-            
-            data[group] = sessions;
-        });
-    };
-
-    // Run processing once on load
-    processAllSchedules(scheduleData);
-
-    // 4. UI FUNCTIONS
     function handleTyping(val) {
         const suggBox = document.getElementById('suggestions');
         if (val.length < 2) { suggBox.style.display = 'none'; return; }
         const filtered = students.filter(s => s.name.toLowerCase().includes(val.toLowerCase())).slice(0, 6);
         if (filtered.length > 0) {
             suggBox.innerHTML = filtered.map(s => `
-                <div class="suggestion-item" onclick="renderSchedule('${s.name}', '${s.group}')">
-                    ${s.name} <small style="display:block; color:#777; font-size:0.8rem; margin-top:4px;">roll_number: ${s.roll_number} • Group: ${s.group}</small>
+                <div class="suggestion-item" onclick="selectStudent('${s.name}', '${s.group}', '${s.roll_number}')">
+                    ${s.name} 
+                    <small style="display:block; color:#777; font-size:0.8rem; margin-top:4px;">
+                        Roll: ${s.roll_number} • Group: ${s.group}
+                    </small>
                 </div>`).join('');
             suggBox.style.display = 'block';
         } else { suggBox.style.display = 'none'; }
     }
 
-    function renderSchedule(name, group) {
+    function selectStudent(name, group, roll) {
+        currentViewing = { name, group, roll };
+        renderSchedule(name, group, roll);
+    }
+
+    function saveAsMe() {
+        if (currentViewing) {
+            localStorage.setItem('myProfile', JSON.stringify(currentViewing));
+            renderSchedule(currentViewing.name, currentViewing.group, currentViewing.roll);
+        }
+    }
+
+    function eraseMe() {
+        if(confirm("Erase your saved profile?")) {
+            localStorage.removeItem('myProfile');
+            location.reload();
+        }
+    }
+
+    function loadSavedProfile() {
+        const saved = localStorage.getItem('myProfile');
+        if (saved) {
+            const { name, group, roll } = JSON.parse(saved);
+            currentViewing = { name, group, roll };
+            renderSchedule(name, group, roll);
+        }
+    }
+
+    function renderSchedule(name, group, roll) {
         document.getElementById('nameSearch').value = name;
         document.getElementById('suggestions').style.display = 'none';
+        
+        const savedData = localStorage.getItem('myProfile');
+        const saved = savedData ? JSON.parse(savedData) : null;
+        
+        // Button Display Logic
+        document.getElementById('saveAsMeBtn').style.display = (!saved || saved.name !== name) ? 'block' : 'none';
+        document.getElementById('returnBtn').style.display = (saved && saved.name !== name) ? 'block' : 'none';
+        document.getElementById('eraseBtn').style.display = (saved && saved.name === name) ? 'block' : 'none';
+
         const output = document.getElementById('output');
         const timetable = scheduleData[group] || [];
         const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
         const today = new Intl.DateTimeFormat('en-US', {weekday: 'long'}).format(new Date());
 
-        let html = `
-            <div style="text-align:center; margin-bottom:50px;">
-                <h3 style="color:white; font-size:1.6rem; margin:0;">${name}</h3>
-                <p style="color:var(--accent); font-size:0.9rem; margin-top:8px;">Academic Group: ${group}</p>
-            </div>`;
+        let html = `<div style="text-align:center; margin-bottom:50px;">
+                        <h3 style="color:white; font-size:1.6rem; margin:0;">${name}</h3>
+                        <p style="color:var(--accent); font-size:0.9rem; margin-top:8px;">
+                            Roll: ${roll} • Group: ${group}
+                        </p>
+                    </div>`;
 
         weekdays.forEach(day => {
             const isToday = (day === today);
             const classes = timetable.filter(c => c.day === day);
-            
             html += `
-                <div class="day-card ${isToday ? 'is-today' : ''}" id="${day}">
+                <div class="day-card ${isToday ? 'is-today' : ''}">
                     <div class="day-header">
                         <h3>${day}</h3>
                         <span class="status-badge">${isToday ? 'TODAY' : 'WEEKDAY'}</span>
@@ -7262,15 +7168,9 @@
                 </div>`;
         });
         output.innerHTML = html;
-
-        setTimeout(() => {
-            const todayCard = document.getElementById(today);
-            if (todayCard) todayCard.scroll_numberIntoView({ behavior: 'smooth', block: 'center' });
-        }, 150);
     }
-</script>
+
+    window.onload = loadSavedProfile;
 </script>
 </body>
 </html>
-
-
