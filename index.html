@@ -11,7 +11,7 @@
         :root {
             --bg: #050505;
             --card-bg: #111111;
-            --accent: #d4af37; /* Metallic Gold */
+            --accent: #d4af37;
             --text-main: #ffffff;
             --text-dim: #777777;
             --border: #222222;
@@ -24,7 +24,6 @@
             color: var(--text-main);
             margin: 0; padding: 0;
             display: flex; flex-direction: column; min-height: 100vh;
-            overflow-x: hidden;
         }
 
         header {
@@ -36,40 +35,65 @@
         h1 { margin: 0; font-size: 2.2rem; font-weight: 700; letter-spacing: -0.5px; }
         h2 { margin: 10px 0 0; font-size: 0.9rem; color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 3px; }
 
-        .main-content { flex: 1; padding: 40px 20px; }
+        .main-content { flex: 1; padding: 20px; }
 
+        /* Search area container */
         .search-wrapper {
-            max-width: 650px; margin: 0 auto 60px;
+            max-width: 650px; 
+            margin: 0 auto 50px;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* Spacing between search bar and buttons */
         }
 
         .input-container {
             background: var(--card-bg);
-            padding: 5px; border-radius: 14px;
-            display: flex; align-items: center;
+            padding: 5px; 
+            border-radius: 14px;
+            display: flex; 
+            align-items: center;
             border: 1px solid var(--border);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.3s ease;
         }
 
         .input-container:focus-within {
             border-color: var(--accent);
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.1);
         }
 
         input {
-            flex: 1; background: transparent; border: none;
-            padding: 18px 25px; color: white; font-size: 1.1rem;
+            flex: 1; 
+            background: transparent; 
+            border: none;
+            padding: 16px 20px; 
+            color: white; 
+            font-size: 1.1rem;
             outline: none;
         }
 
-        /* Action Buttons */
-        .btn-group { display: flex; gap: 8px; margin-right: 12px; }
+        /* Buttons row below the bar */
+        .btn-group { 
+            display: flex; 
+            gap: 10px; 
+            justify-content: center;
+            flex-wrap: wrap; /* Allows wrapping on small screens */
+        }
         
         .btn {
-            padding: 10px 16px; border-radius: 8px; font-weight: 700; 
-            font-size: 0.75rem; cursor: pointer; white-space: nowrap; border: none;
-            display: none; transition: 0.3s;
-            text-transform: uppercase; letter-spacing: 1px;
+            padding: 12px 20px; 
+            border-radius: 10px; 
+            font-weight: 700; 
+            font-size: 0.75rem; 
+            cursor: pointer; 
+            border: none;
+            display: none; /* Controlled by JS */
+            transition: 0.3s;
+            text-transform: uppercase; 
+            letter-spacing: 1px;
+            flex: 1; /* Buttons grow equally */
+            min-width: 140px;
+            max-width: 200px;
         }
 
         .btn-save { background: var(--accent); color: black; }
@@ -77,80 +101,41 @@
         .btn-erase { background: #441111; color: #ff9999; }
 
         #suggestions {
-            position: absolute; top: 115%; left: 0; right: 0;
-            background: #0f0f0f; border-radius: 12px;
-            overflow: hidden; z-index: 1000; display: none;
+            position: absolute; 
+            top: 65px; /* Positioned below input but above buttons */
+            left: 0; right: 0;
+            background: #0f0f0f; 
+            border-radius: 12px;
+            overflow: hidden; 
+            z-index: 1000; 
+            display: none;
             box-shadow: 0 25px 50px rgba(0,0,0,0.8);
             border: 1px solid var(--border);
         }
 
-        .suggestion-item { 
-            padding: 18px 25px; cursor: pointer; 
-            transition: all 0.2s; border-bottom: 1px solid var(--border);
-        }
+        .suggestion-item { padding: 18px 25px; cursor: pointer; border-bottom: 1px solid var(--border); }
         .suggestion-item:hover { background: #1a1a1a; color: var(--accent); }
 
-        .schedule-grid {
-            max-width: 900px; margin: 0 auto;
-            display: grid; gap: 30px;
-            padding-bottom: 100px;
-        }
-
-        .day-card {
-            background: var(--card-bg); 
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            overflow: hidden;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
-                        box-shadow 0.4s ease, 
-                        border-color 0.4s ease;
-        }
-
-        .day-card:hover {
-            transform: translateY(var(--hover-elevate)) scale(1.02);
-            border-color: var(--accent);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(212, 175, 55, 0.1);
-            z-index: 10;
-        }
-
-        .is-today { 
-            border: 2px solid var(--accent) !important; 
-            background: rgba(212, 175, 55, 0.05); 
-        }
-
-        .day-header {
-            padding: 20px 30px; border-bottom: 1px solid var(--border);
-            display: flex; justify-content: space-between; align-items: center;
-        }
-
-        .day-header h3 { margin: 0; font-size: 1.1rem; color: var(--accent); font-weight: 700; text-transform: uppercase; }
-
-        .status-badge {
-            font-size: 0.7rem; padding: 6px 14px; border-radius: 5px;
-            background: #1a1a1a; color: var(--text-dim); font-weight: 800;
-        }
-
+        /* Schedule layout */
+        .schedule-grid { max-width: 900px; margin: 0 auto; display: grid; gap: 25px; padding-bottom: 80px; }
+        .day-card { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
+        .is-today { border: 2px solid var(--accent) !important; background: rgba(212, 175, 55, 0.05); }
+        .day-header { padding: 20px 30px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .day-header h3 { margin: 0; font-size: 1.1rem; color: var(--accent); text-transform: uppercase; }
+        .status-badge { font-size: 0.7rem; padding: 6px 14px; border-radius: 5px; background: #1a1a1a; color: var(--text-dim); font-weight: 800; }
         .is-today .status-badge { background: var(--accent); color: #000; }
 
-        .class-row {
-            display: grid; grid-template-columns: 180px 1fr 150px;
-            padding: 20px 30px; align-items: center;
-        }
-        
+        .class-row { display: grid; grid-template-columns: 160px 1fr 140px; padding: 20px 30px; align-items: center; }
         .class-row:not(:last-child) { border-bottom: 1px solid var(--border); }
-
-        .time { font-weight: 600; color: #fff; font-size: 0.95rem; }
-        .course-name { color: #ccc; }
+        .time { font-weight: 600; color: #fff; }
         .room-tag { color: var(--accent); font-size: 0.85rem; text-align: right; font-weight: 600; }
 
-        footer {
-            margin-top: auto; padding: 50px; text-align: center;
-            color: var(--accent); font-size: 1rem; border-top: 1px solid var(--border);
-        }
+        footer { padding: 40px; text-align: center; color: var(--accent); border-top: 1px solid var(--border); margin-top: auto; }
 
-        @media (max-width: 768px) {
-            .class-row { grid-template-columns: 1fr; gap: 12px; padding: 25px; }
+        @media (max-width: 600px) {
+            .class-row { grid-template-columns: 1fr; gap: 10px; padding: 20px; }
             .room-tag { text-align: left; }
+            .btn { flex: 1 1 calc(50% - 10px); max-width: none; } /* Stacks buttons nicely on mobile */
         }
     </style>
 </head>
@@ -164,14 +149,15 @@
 <div class="main-content">
     <div class="search-wrapper">
         <div class="input-container">
-            <input type="text" id="nameSearch" placeholder="Search name for friend or self..." autocomplete="off" oninput="handleTyping(this.value)">
-            <div class="btn-group">
-                <button id="saveAsMeBtn" class="btn btn-save" onclick="saveAsMe()">SAVE AS ME</button>
-                <button id="returnBtn" class="btn btn-return" onclick="loadSavedProfile()">RETURN TO ME</button>
-                <button id="eraseBtn" class="btn btn-erase" onclick="eraseMe()">RESET</button>
-            </div>
+            <input type="text" id="nameSearch" placeholder="Search your name..." autocomplete="off" oninput="handleTyping(this.value)">
         </div>
         <div id="suggestions"></div>
+        
+        <div class="btn-group">
+            <button id="saveAsMeBtn" class="btn btn-save" onclick="saveAsMe()">SAVE AS ME</button>
+            <button id="returnBtn" class="btn btn-return" onclick="loadSavedProfile()">RETURN TO ME</button>
+            <button id="eraseBtn" class="btn btn-erase" onclick="eraseMe()">RESET</button>
+        </div>
     </div>
     <div id="output" class="schedule-grid"></div>
 </div>
@@ -179,8 +165,7 @@
 <footer>Made with ❤️ by π</footer>
 
 <script>
-    // DATA SECTION
-    // Copy the students array from your original file here
+    // Paste the 'students' array and 'scheduleData' object here from your source
     const students = [
   {
     "name": "Abhirup Dhara",
@@ -4072,10 +4057,7 @@
     "group": "G24",
     "roll_number": "2502VL01"
   }
-]
-
-
-    // Copy the full scheduleData JSON here
+] 
     const scheduleData = {
     "G1": [
         {
@@ -7078,6 +7060,7 @@
         }
     ]
 }
+
     let currentViewing = null;
 
     function handleTyping(val) {
@@ -7087,10 +7070,7 @@
         if (filtered.length > 0) {
             suggBox.innerHTML = filtered.map(s => `
                 <div class="suggestion-item" onclick="selectStudent('${s.name}', '${s.group}', '${s.roll_number}')">
-                    ${s.name} 
-                    <small style="display:block; color:#777; font-size:0.8rem; margin-top:4px;">
-                        Roll: ${s.roll_number} • Group: ${s.group}
-                    </small>
+                    ${s.name} <small style="display:block;color:#777">Roll: ${s.roll_number}</small>
                 </div>`).join('');
             suggBox.style.display = 'block';
         } else { suggBox.style.display = 'none'; }
@@ -7109,7 +7089,7 @@
     }
 
     function eraseMe() {
-        if(confirm("Erase your saved profile?")) {
+        if(confirm("Reset and erase your profile?")) {
             localStorage.removeItem('myProfile');
             location.reload();
         }
@@ -7118,9 +7098,9 @@
     function loadSavedProfile() {
         const saved = localStorage.getItem('myProfile');
         if (saved) {
-            const { name, group, roll } = JSON.parse(saved);
-            currentViewing = { name, group, roll };
-            renderSchedule(name, group, roll);
+            const data = JSON.parse(saved);
+            currentViewing = data;
+            renderSchedule(data.name, data.group, data.roll);
         }
     }
 
@@ -7131,7 +7111,6 @@
         const savedData = localStorage.getItem('myProfile');
         const saved = savedData ? JSON.parse(savedData) : null;
         
-        // Button Display Logic
         document.getElementById('saveAsMeBtn').style.display = (!saved || saved.name !== name) ? 'block' : 'none';
         document.getElementById('returnBtn').style.display = (saved && saved.name !== name) ? 'block' : 'none';
         document.getElementById('eraseBtn').style.display = (saved && saved.name === name) ? 'block' : 'none';
@@ -7141,11 +7120,9 @@
         const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
         const today = new Intl.DateTimeFormat('en-US', {weekday: 'long'}).format(new Date());
 
-        let html = `<div style="text-align:center; margin-bottom:50px;">
-                        <h3 style="color:white; font-size:1.6rem; margin:0;">${name}</h3>
-                        <p style="color:var(--accent); font-size:0.9rem; margin-top:8px;">
-                            Roll: ${roll} • Group: ${group}
-                        </p>
+        let html = `<div style="text-align:center; margin-bottom:40px;">
+                        <h3 style="color:white; font-size:1.5rem; margin:0;">${name}</h3>
+                        <p style="color:var(--accent); font-size:0.9rem;">Roll: ${roll} • Group: ${group}</p>
                     </div>`;
 
         weekdays.forEach(day => {
@@ -7163,7 +7140,7 @@
                                 <span class="time">${c.time}</span>
                                 <span class="course-name">${c.course}</span>
                                 <span class="room-tag">📍 ${c.room}</span>
-                            </div>`).join('') : '<div style="padding:40px; color:#555; text-align:center;">No lectures today.</div>'}
+                            </div>`).join('') : '<div style="padding:40px; color:#555; text-align:center;">No classes today.</div>'}
                     </div>
                 </div>`;
         });
