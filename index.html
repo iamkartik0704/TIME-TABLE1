@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml"
+  href="data:image/svg+xml,
+  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+    <rect width='100' height='100' rx='18' fill='%23050505'/>
+    <text x='50%25' y='62%25'
+          text-anchor='middle'
+          font-size='64'
+          fill='%23d4af37'
+          font-family='Arial'
+          font-weight='700'>pi</text>
+  </svg>">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Student Timetable Finder | IIT Patna (2nd Year)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --bg: #050505;
+        --card-bg: #111111;
+        --accent: #d4af37;
+        --text-main: #ffffff;
+        --text-dim: #777777;
+        --border: #222222;
+        --sidebar-width: 280px;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+        font-family: 'Inter', sans-serif;
+        background: var(--bg);
+        color: var(--text-main);
+        margin: 0; padding: 0;
+        display: flex; flex-direction: column; min-height: 100vh;
+    }
+    .navbar {
+        background: #000;
+        border-bottom: 1px solid var(--border);
+        padding: 0 20px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 2000;
+    }
+    .navbar .brand { color: var(--accent); font-weight: 800; letter-spacing: 1px; font-size: 0.95rem; }
+    header {
+        padding: 3rem 1rem 2rem;
+        text-align: center;
+        border-bottom: 1px solid var(--border);
+    }
+    h1 { margin: 0; font-size: 2rem; font-weight: 700; letter-spacing: -0.5px; }
+    h2 { margin: 10px 0 0; font-size: 0.85rem; color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 3px; }
+    .main-content { flex: 1; padding: 20px; }
+    .search-wrapper {
+        max-width: 650px;
+        margin: 0 auto 40px;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    .input-container {
+        background: var(--card-bg);
+        padding: 5px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        border: 1px solid var(--border);
+        transition: all 0.3s ease;
+    }
+    .input-container:focus-within {
+        border-color: var(--accent);
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.1);
+    }
+    input, select {
+        flex: 1;
+        background: transparent;
+        border: none;
+        padding: 16px 20px;
+        color: white;
+        font-size: 1.1rem;
+        outline: none;
+        font-family: inherit;
+    }
+    .btn-group { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .btn {
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 0.75rem;
+        cursor: pointer;
+        border: none;
+        display: none;
+        transition: 0.3s;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        flex: 1;
+        min-width: 140px;
+        max-width: 200px;
+    }
+    .btn-save { background: var(--accent); color: black; }
+    .btn-return { background: #222; color: var(--accent); border: 1px solid var(--accent); }
+    .btn-erase { background: #441111; color: #ff9999; }
+    #suggestions {
+        position: absolute;
+        top: 65px;
+        left: 0; right: 0;
+        background: #0f0f0f;
+        border-radius: 12px;
+        overflow: hidden;
+        z-index: 1000;
+        display: none;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.8);
+        border: 1px solid var(--border);
+    }
+    .suggestion-item { padding: 18px 25px; cursor: pointer; border-bottom: 1px solid var(--border); }
+    .suggestion-item:hover { background: #1a1a1a; color: var(--accent); }
+    .schedule-grid { max-width: 900px; margin: 0 auto; display: grid; gap: 25px; padding-bottom: 80px; }
+    .day-card { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
+    .is-today { border: 2px solid var(--accent) !important; background: rgba(212, 175, 55, 0.05); }
+    .day-header { padding: 20px 30px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .day-header h3 { margin: 0; font-size: 1.1rem; color: var(--accent); text-transform: uppercase; }
+    .status-badge { font-size: 0.7rem; padding: 6px 14px; border-radius: 5px; background: #1a1a1a; color: var(--text-dim); font-weight: 800; }
+    .is-today .status-badge { background: var(--accent); color: #000; }
+    .class-row { display: grid; grid-template-columns: 150px 1fr 130px; padding: 18px 30px; align-items: center; gap: 8px; }
+    .class-row:not(:last-child) { border-bottom: 1px solid var(--border); }
+    .time { font-weight: 600; color: #fff; font-size: 0.9rem; }
+    .room-tag { color: var(--accent); font-size: 0.8rem; text-align: right; font-weight: 600; }
+    .course-name { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .type-badge { font-size: 0.62rem; padding: 3px 8px; border-radius: 4px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+    .type-Lecture { background: #1a2a1a; color: #8fd98f; }
+    .type-Tutorial { background: #1a1a2a; color: #8f9dd9; }
+    .type-Lab { background: #2a1a1a; color: #d98f8f; }
+    .type-Elective { background: #2a220a; color: var(--accent); }
+    .config-card { max-width: 900px; margin: 0 auto 25px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 24px 28px; }
+    .config-card h4 { margin: 0 0 6px; color: var(--accent); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; }
+    .config-card p { margin: 0 0 14px; color: var(--text-dim); font-size: 0.85rem; line-height: 1.5; }
+    .config-card select {
+        width: 100%; background: #1a1a1a; border: 1px solid var(--border); border-radius: 10px;
+        padding: 12px 16px; color: #fff; font-size: 0.95rem;
+    }
+    footer { padding: 40px; text-align: center; color: var(--accent); border-top: 1px solid var(--border); margin-top: auto; }
+    .profile-header { text-align: center; margin-bottom: 30px; }
+    .profile-header h3 { color: white; font-size: 1.5rem; margin: 0; }
+    .profile-header p { color: var(--accent); font-size: 0.9rem; margin-top: 6px; }
+    @media (max-width: 600px) {
+        .class-row { grid-template-columns: 1fr; text-align: left; gap: 4px; }
+        .room-tag { text-align: left; }
+    }
+</style>
+</head>
+<body>
+
+<div class="navbar">
+    <span class="brand">π IIT Patna</span>
+    <span style="color:var(--text-dim); font-size:0.75rem;">2nd Year · Autumn 2026</span>
+</div>
+
+<header>
+    <h1>Student Timetable Finder</h1>
+    <h2>2nd Year — Branch Timetable</h2>
+</header>
+
+<div class="main-content">
+    <div class="search-wrapper">
+        <div class="input-container">
+            <input type="text" id="nameSearch" placeholder="Search your name..." oninput="handleTyping(this.value)" autocomplete="off">
+        </div>
+        <div id="suggestions"></div>
+        <div class="btn-group">
+            <button class="btn btn-save" id="saveAsMeBtn" onclick="saveAsMe()">Save as Me</button>
+            <button class="btn btn-return" id="returnBtn" onclick="loadSavedProfile()">Back to My Schedule</button>
+            <button class="btn btn-erase" id="eraseBtn" onclick="eraseMe()">Erase My Profile</button>
+        </div>
+    </div>
+
+    <div id="configArea"></div>
+    <div class="schedule-grid" id="output"></div>
+</div>
+
+<footer>Made with π by comπle &middot; IIT Patna</footer>
+
+<script src="data.js"></script>
+<script>
+// ---- Branch -> course track mapping (derived from roll number chars 4-5) ----
+const branchTrack = {
+    AI: 'CSE', CS: 'CSE',
+    CB: 'CBE',
+    CE: 'CEE', GT: 'CEE', ST: 'CEE',
+    CT: 'CHEM',
+    EE: 'EE', PC: 'EE', VL: 'EE',
+    EC: 'ECE', CM: 'ECE',
+    ES: 'HSS',
+    MC: 'MATH',
+    ME: 'ME', MT: 'ME',
+    MM: 'MME',
+    PH: 'PHY'
+};
+
+// ---- HSS elective options (3rd-semester "HS21XX" slot). Not shown for ES branch
+// (ES students take HS2101-2108 as their own major courses, not this elective). ----
+const electiveOptions = {
+    HS2110: { name: 'HS2110', sessions: [
+        {day:'Wednesday', time:'2 PM - 3 PM', room:'LT103'},
+        {day:'Thursday', time:'2 PM - 3 PM', room:'LT103'},
+        {day:'Friday', time:'2 PM - 3 PM', room:'LT103'}
+    ]},
+    HS2111: { name: 'HS2111', sessions: [
+        {day:'Tuesday', time:'2 PM - 3 PM', room:'LT001'},
+        {day:'Wednesday', time:'2 PM - 3 PM', room:'LT001'},
+        {day:'Thursday', time:'2 PM - 3 PM', room:'LT001'}
+    ]},
+    HS2112: { name: 'HS2112', sessions: [
+        {day:'Tuesday', time:'2 PM - 3 PM', room:'LT103'},
+        {day:'Wednesday', time:'2 PM - 3 PM', room:'LT003'},
+        {day:'Thursday', time:'2 PM - 3 PM', room:'LT003'}
+    ]}
+};
+
+// ---- EC2101/EE2101 shared practical, split into rotating batches G1/G2/G3.
+// Only relevant to EE-family branches (EE, PC, VL, EC, CM). No student->batch
+// mapping exists in the source timetable, so this is a temporary self-select. ----
+const labGroupOptions = {
+    G1: [{day:'Wednesday', time:'4 PM - 6 PM', room:'LT102'}, {day:'Friday', time:'4 PM - 6 PM', room:'LT102'}],
+    G2: [{day:'Wednesday', time:'4 PM - 6 PM', room:'LT102'}, {day:'Thursday', time:'4 PM - 6 PM', room:'LT102'}],
+    G3: [{day:'Thursday', time:'4 PM - 6 PM', room:'LT102'}, {day:'Friday', time:'4 PM - 6 PM', room:'LT102'}]
+};
+const eeFamilyBranches = ['EE','PC','VL','EC','CM'];
+
+function getBranch(roll) { return roll.substring(4, 6); }
+
+function toggleSidebarNoop() {} // placeholder (no sidebar in this version)
+
+function handleTyping(val) {
+    const suggBox = document.getElementById('suggestions');
+    if (val.length < 2) { suggBox.style.display = 'none'; return; }
+    const filtered = students.filter(s => s.name.toLowerCase().includes(val.toLowerCase())).slice(0, 6);
+    if (filtered.length > 0) {
+        suggBox.innerHTML = filtered.map(s => `
+            <div class="suggestion-item" onclick="selectStudent('${s.name.replace(/'/g,"\\'")}', '${s.roll}')">
+                ${s.name} <small style="display:block;color:#777">Roll: ${s.roll} &middot; Branch: ${getBranch(s.roll)}</small>
+            </div>`).join('');
+        suggBox.style.display = 'block';
+    } else { suggBox.style.display = 'none'; }
+}
+
+function selectStudent(name, roll) { renderSchedule(name, roll); }
+
+function saveAsMe() {
+    if (currentViewing) {
+        localStorage.setItem('myProfile', JSON.stringify(currentViewing));
+        renderSchedule(currentViewing.name, currentViewing.roll);
+    }
+}
+
+function eraseMe() {
+    if (confirm("Reset and erase your profile?")) {
+        localStorage.removeItem('myProfile');
+        location.reload();
+    }
+}
+
+function loadSavedProfile() {
+    const saved = localStorage.getItem('myProfile');
+    if (saved) {
+        const data = JSON.parse(saved);
+        renderSchedule(data.name, data.roll);
+    }
+}
+
+function parseTime(timeStr) {
+    const cleanTime = timeStr.split(' - ')[0].trim().toLowerCase().replace(/\./g, ':');
+    let match = cleanTime.match(/(\d+)(?::(\d+))?/);
+    let hours = match ? parseInt(match[1]) : 0;
+    let minutes = match && match[2] ? parseInt(match[2]) : 0;
+    if (cleanTime.includes('pm') && hours !== 12) hours += 12;
+    if (cleanTime.includes('am') && hours === 12) hours = 0;
+    if (cleanTime.includes('noon')) hours = 12;
+    return hours * 60 + minutes;
+}
+
+function renderConfig(roll, branch, track) {
+    const configArea = document.getElementById('configArea');
+    let html = '';
+
+    if (branch !== 'ES') {
+        const savedElective = localStorage.getItem('elective_' + roll) || '';
+        html += `
+        <div class="config-card">
+            <h4>HSS Elective (HS21XX slot)</h4>
+            <p>This semester's HSS elective slot isn't tied to specific students in the source timetable, so pick the one you're actually enrolled in — it'll be remembered on this device.</p>
+            <select onchange="setElective('${roll}', this.value)">
+                <option value="">— Select your elective —</option>
+                ${Object.keys(electiveOptions).map(code => `<option value="${code}" ${savedElective===code?'selected':''}>${code}</option>`).join('')}
+            </select>
+        </div>`;
+    }
+
+    if (eeFamilyBranches.includes(branch)) {
+        const savedGroup = localStorage.getItem('labgroup_' + roll) || '';
+        html += `
+        <div class="config-card">
+            <h4>EC2101/EE2101 Practical Batch</h4>
+            <p>This practical runs as rotating batches (G1/G2/G3) with no student-batch list in the source timetable. Pick your batch to see the right lab days.</p>
+            <select onchange="setLabGroup('${roll}', this.value)">
+                <option value="">— Select your batch —</option>
+                ${Object.keys(labGroupOptions).map(g => `<option value="${g}" ${savedGroup===g?'selected':''}>${g}</option>`).join('')}
+            </select>
+        </div>`;
+    }
+
+    configArea.innerHTML = html;
+}
+
+function setElective(roll, code) {
+    if (code) localStorage.setItem('elective_' + roll, code);
+    else localStorage.removeItem('elective_' + roll);
+    if (currentViewing) renderSchedule(currentViewing.name, currentViewing.roll);
+}
+
+function setLabGroup(roll, group) {
+    if (group) localStorage.setItem('labgroup_' + roll, group);
+    else localStorage.removeItem('labgroup_' + roll);
+    if (currentViewing) renderSchedule(currentViewing.name, currentViewing.roll);
+}
+
+let currentViewing = null;
+
+function renderSchedule(name, roll) {
+    currentViewing = { name, roll };
+    document.getElementById('nameSearch').value = name;
+    document.getElementById('suggestions').style.display = 'none';
+
+    const savedData = localStorage.getItem('myProfile');
+    const saved = savedData ? JSON.parse(savedData) : null;
+
+    document.getElementById('saveAsMeBtn').style.display = (!saved || saved.roll !== roll) ? 'block' : 'none';
+    document.getElementById('returnBtn').style.display = (saved && saved.roll !== roll) ? 'block' : 'none';
+    document.getElementById('eraseBtn').style.display = (saved && saved.roll === roll) ? 'block' : 'none';
+
+    const branch = getBranch(roll);
+    const track = branchTrack[branch];
+
+    renderConfig(roll, branch, track);
+
+    // Build full list of sessions for this student
+    let allSessions = [];
+    if (track && trackCourses[track]) {
+        for (const code in trackCourses[track]) {
+            const courseName = courseNames[code] || code;
+            trackCourses[track][code].forEach(sess => {
+                allSessions.push({ code, name: courseName, day: sess.day, time: sess.time, room: sess.room, type: sess.type });
+            });
+        }
+    }
+    const elective = localStorage.getItem('elective_' + roll);
+    if (elective && electiveOptions[elective]) {
+        electiveOptions[elective].sessions.forEach(sess => {
+            allSessions.push({ code: elective, name: elective + ' (Elective)', day: sess.day, time: sess.time, room: sess.room, type: 'Elective' });
+        });
+    }
+    const labGroup = localStorage.getItem('labgroup_' + roll);
+    if (labGroup && eeFamilyBranches.includes(branch) && labGroupOptions[labGroup]) {
+        labGroupOptions[labGroup].forEach(sess => {
+            allSessions.push({ code: 'EC2101/EE2101', name: `Practical (Batch ${labGroup})`, day: sess.day, time: sess.time, room: sess.room, type: 'Lab' });
+        });
+    }
+
+    const output = document.getElementById('output');
+    const weekdays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+    const today = new Intl.DateTimeFormat('en-US', {weekday: 'long'}).format(new Date());
+
+    let html = `<div class="profile-header">
+                    <h3>${name}</h3>
+                    <p>Roll: ${roll} &middot; Branch: ${branch}${track ? '' : ' (no timetable data mapped yet)'}</p>
+                </div>`;
+
+    weekdays.forEach(day => {
+        const isToday = (day === today);
+        let classes = allSessions.filter(c => c.day === day);
+        classes.sort((a, b) => parseTime(a.time) - parseTime(b.time));
+
+        html += `
+            <div class="day-card ${isToday ? 'is-today' : ''}">
+                <div class="day-header">
+                    <h3>${day}</h3>
+                    <span class="status-badge">${isToday ? 'TODAY' : 'WEEKDAY'}</span>
+                </div>
+                <div>
+                    ${classes.length > 0 ? classes.map(c => `
+                        <div class="class-row">
+                            <span class="time">${c.time}</span>
+                            <span class="course-name">${c.code} — ${c.name}<span class="type-badge type-${c.type}">${c.type}</span></span>
+                            <span class="room-tag">📍 ${c.room}</span>
+                        </div>`).join('') : '<div style="padding:40px; color:#555; text-align:center;">No classes today.</div>'}
+                </div>
+            </div>`;
+    });
+    output.innerHTML = html;
+}
+
+window.onload = loadSavedProfile;
+</script>
+</body>
+</html>
