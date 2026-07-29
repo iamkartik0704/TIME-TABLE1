@@ -27,12 +27,13 @@
         --sidebar-width: 280px;
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body {
+    body, html {
         font-family: 'Inter', sans-serif;
         background: var(--bg);
         color: var(--text-main);
         margin: 0; padding: 0;
         display: flex; flex-direction: column; min-height: 100vh;
+        overflow-x: hidden;
     }
     .navbar {
         background: #000;
@@ -139,10 +140,39 @@
     .config-card { max-width: 900px; margin: 0 auto 25px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 24px 28px; }
     .config-card h4 { margin: 0 0 6px; color: var(--accent); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; }
     .config-card p { margin: 0 0 14px; color: var(--text-dim); font-size: 0.85rem; line-height: 1.5; }
-    .config-card select {
+    /* Custom Select Dropdowns */
+    .custom-select { position: relative; width: 100%; user-select: none; }
+    .custom-select-btn { 
         width: 100%; background: #1a1a1a; border: 1px solid var(--border); border-radius: 10px;
-        padding: 12px 16px; color: #fff; font-size: 0.95rem;
+        padding: 14px 40px 14px 16px; color: #fff; font-size: 0.95rem; text-align: left;
+        cursor: pointer; position: relative; transition: all 0.3s ease;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
+    .custom-select-btn::after {
+        content: ''; position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+        width: 16px; height: 16px;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d4af37' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        background-repeat: no-repeat; background-position: center; background-size: contain;
+        transition: transform 0.3s ease;
+    }
+    .custom-select.open .custom-select-btn::after { transform: translateY(-50%) rotate(180deg); }
+    .custom-select-options {
+        position: absolute; top: calc(100% + 8px); left: 0; right: 0;
+        background: #111; border: 1px solid var(--accent); border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.9); z-index: 3000;
+        max-height: 280px; overflow-y: auto; display: none;
+    }
+    .custom-select.open .custom-select-options { display: block; animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    .custom-select.open .custom-select-btn { border-color: var(--accent); box-shadow: 0 0 15px rgba(212, 175, 55, 0.05); }
+    .custom-option {
+        padding: 14px 16px; color: var(--text-dim); cursor: pointer; transition: 0.2s;
+        border-bottom: 1px solid #1a1a1a;
+        white-space: normal; line-height: 1.5; font-size: 0.9rem;
+    }
+    .custom-option:last-child { border-bottom: none; }
+    .custom-option:hover, .custom-option.selected { background: #1a1a1a; color: #fff; }
+    .custom-option.selected { color: var(--accent); font-weight: 600; }
     footer { padding: 40px; text-align: center; color: var(--accent); border-top: 1px solid var(--border); margin-top: auto; }
     .profile-header { text-align: center; margin-bottom: 30px; }
     .profile-header h3 { color: white; font-size: 1.5rem; margin: 0; }
@@ -151,13 +181,49 @@
         .class-row { grid-template-columns: 1fr; text-align: left; gap: 4px; }
         .room-tag { text-align: left; }
     }
+    .sidebar-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5); z-index: 2000; display: none;
+    }
+    .sidebar {
+        position: fixed; top: 0; right: -300px; width: 300px; height: 100%;
+        background: #000; z-index: 2001; transition: 0.3s ease;
+        border-left: 1px solid var(--border); padding: 30px 20px;
+        box-shadow: -10px 0 30px rgba(0,0,0,0.8);
+        color: var(--text-main);
+    }
+    .sidebar.active { right: 0; }
+    .sidebar-overlay.active { display: block; }
+    .sidebar-header {
+        display: flex; justify-content: space-between; align-items: center;
+        border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 25px;
+    }
+    .sidebar-header h3 { margin: 0; color: var(--accent); font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; }
+    .close-btn { background: none; border: none; color: var(--text-dim); font-size: 1.8rem; cursor: pointer; padding: 0; transition: color 0.2s; }
+    .close-btn:hover { color: var(--text-main); }
+    .menu-btn { background: none; border: none; color: var(--accent); font-size: 1.5rem; cursor: pointer; padding: 0 10px; transition: transform 0.2s; }
+    .menu-btn:hover { transform: scale(1.1); }
 </style>
 </head>
 <body>
 
 <div class="navbar">
     <span class="brand">π IIT Patna</span>
-    <span style="color:var(--text-dim); font-size:0.75rem;">2nd Year · Autumn 2026</span>
+    <div style="display: flex; align-items: center;">
+        <span style="color:var(--text-dim); font-size:0.75rem; margin-right: 15px;">2nd Year · Autumn 2026</span>
+        <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+    </div>
+</div>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <h3>Settings</h3>
+        <button class="close-btn" onclick="toggleSidebar()">×</button>
+    </div>
+    <div id="sidebarConfigArea">
+        <p style="color: var(--text-dim); font-size: 0.9rem;">Select a profile to configure settings.</p>
+    </div>
 </div>
 
 <header>
@@ -182,10 +248,64 @@
     <div class="schedule-grid" id="output"></div>
 </div>
 
-<footer>Made with 💛 by π &middot; IIT Patna</footer>
+<footer>Made with 💛 by π &middot; </footer>
 
-<script src="data.js"></script>
+<script src="courses.js"></script>
+<script src="stud.js"></script>
 <script>
+    // Global click listener to close custom dropdowns
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.custom-select')) {
+            document.querySelectorAll('.custom-select.open').forEach(el => el.classList.remove('open'));
+        }
+    });
+
+    const output = document.getElementById('output');
+const courseNames = {
+    EP2101: "Quantum Physics",
+    EP2102: "Optics and Lasers",
+    EP2103: "Classical dynamics: discrete and continuum systems",
+    EP2104: "Thermal physics with engineering applications",
+    EE2101: "Measurements and Instrumentation",
+    EE2102: "Network Analysis and Synthesis",
+    EE2103: "Electrical Machines - I",
+    EC2101: "Analog Circuits",
+    EC2102: "Signals and Systems",
+    EC2103: "Semiconductor Devices",
+    CE2101: "Geomatics Engineering",
+    CE2102: "Structural Mechanics",
+    CE2103: "Fluid Mechanics",
+    CE2104: "Geology for Engineers",
+    CS2101: "Algorithms",
+    CS2102: "Digital Logic",
+    CS2103: "AI Concepts",
+    CS2104: "Discrete Mathematics",
+    CS2105: "Optimization Technique",
+    ME2101: "Dynamics",
+    ME2102: "Thermodynamics",
+    ME2103: "Fluid Mechanics",
+    ME2104: "Engineering Materials",
+    CB2101: "Introduction to Chemical Engineering",
+    CB2102: "Fluid Mechanics",
+    CB2103: "Heat Transfer",
+    CB2104: "Chemical Process Calculations",
+    CB2105: "Chemical Engineering Thermodynamics",
+    CH2101: "Organic Chemistry",
+    CH2102: "Inorganic Chemistry",
+    CH2103: "Introduction to Quantum Chemistry",
+    CH2104: "Fluid Mechanics",
+    CH2105: "Chemical Process Calculations",
+    MA2101: "Design and Analysis of Algorithms",
+    MA2102: "Probability and Stochastic Processes",
+    MA2103: "Optimization Techniques",
+    MA2104: "Algebra",
+    MA2105: "Discrete Mathematics",
+    MM2101: "Introduction to Metallurgical and Materials Engineering",
+    MM2102: "Mineral Processing and Process Metallurgy",
+    MM2103: "Thermodynamics and Phase Equilibria",
+    MM2104: "Transport Phenomena",
+    MM2105: "Fundamentals of Polymer Science and Technology"
+};
 // ---- Branch -> course track mapping (derived from roll number chars 4-5) ----
 const branchTrack = {
     AI: 'CSE', CS: 'CSE',
@@ -195,7 +315,7 @@ const branchTrack = {
     EE: 'EE', PC: 'EE', VL: 'EE',
     EC: 'ECE', CM: 'ECE',
     ES: 'HSS',
-    MC: 'MATH',
+    MnC: 'MATH',
     ME: 'ME', MT: 'ME',
     MM: 'MME',
     PH: 'PHY'
@@ -204,17 +324,17 @@ const branchTrack = {
 // ---- HSS elective options (3rd-semester "HS21XX" slot). Not shown for ES branch
 // (ES students take HS2101-2108 as their own major courses, not this elective). ----
 const electiveOptions = {
-    HS2110: { name: 'HS2110', sessions: [
+    HS2110: { name: 'HS2110 - Language Human Mind and Indian Society', sessions: [
         {day:'Wednesday', time:'2 PM - 3 PM', room:'LT103'},
         {day:'Thursday', time:'2 PM - 3 PM', room:'LT103'},
         {day:'Friday', time:'2 PM - 3 PM', room:'LT103'}
     ]},
-    HS2111: { name: 'HS2111', sessions: [
+    HS2111: { name: 'HS2111 - Introductory Sociology', sessions: [
         {day:'Tuesday', time:'2 PM - 3 PM', room:'LT001'},
         {day:'Wednesday', time:'2 PM - 3 PM', room:'LT001'},
         {day:'Thursday', time:'2 PM - 3 PM', room:'LT001'}
     ]},
-    HS2112: { name: 'HS2112', sessions: [
+    HS2112: { name: 'HS2112 - Introduction to Demography', sessions: [
         {day:'Tuesday', time:'2 PM - 3 PM', room:'LT103'},
         {day:'Wednesday', time:'2 PM - 3 PM', room:'LT003'},
         {day:'Thursday', time:'2 PM - 3 PM', room:'LT003'}
@@ -231,9 +351,15 @@ const labGroupOptions = {
 };
 const eeFamilyBranches = ['EE','PC','VL','EC','CM'];
 
-function getBranch(roll) { return roll.substring(4, 6); }
+function getBranch(roll) { 
+    const b = roll.substring(4, 6);
+    return b === 'MC' ? 'MnC' : b;
+}
 
-function toggleSidebarNoop() {} // placeholder (no sidebar in this version)
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('active');
+    document.getElementById('sidebarOverlay').classList.toggle('active');
+}
 
 function handleTyping(val) {
     const suggBox = document.getElementById('suggestions');
@@ -272,48 +398,121 @@ function loadSavedProfile() {
     }
 }
 
-function parseTime(timeStr) {
-    const cleanTime = timeStr.split(' - ')[0].trim().toLowerCase().replace(/\./g, ':');
-    let match = cleanTime.match(/(\d+)(?::(\d+))?/);
+function parseTime(timeStr, isEnd = false) {
+    const parts = timeStr.split('-');
+    const str = (isEnd && parts.length > 1) ? parts[1].trim().toLowerCase() : parts[0].trim().toLowerCase();
+    
+    let match = str.match(/(\d+)(?:[:.](\d+))?/);
     let hours = match ? parseInt(match[1]) : 0;
     let minutes = match && match[2] ? parseInt(match[2]) : 0;
-    if (cleanTime.includes('pm') && hours !== 12) hours += 12;
-    if (cleanTime.includes('am') && hours === 12) hours = 0;
-    if (cleanTime.includes('noon')) hours = 12;
+    
+    if (str.includes('pm') || str.includes('noon')) {
+        if (hours !== 12) hours += 12;
+    } else if (str.includes('am')) {
+        if (hours === 12) hours = 0;
+    } else {
+        if (hours >= 1 && hours <= 7) {
+            hours += 12;
+        }
+    }
     return hours * 60 + minutes;
+}
+
+function calculateTotalHours(classes) {
+    let totalMinutes = 0;
+    classes.forEach(c => {
+        let start = parseTime(c.time, false);
+        let end = parseTime(c.time, true);
+        if (end > start) {
+            totalMinutes += (end - start);
+        }
+    });
+    
+    if (totalMinutes === 0) return '';
+    let hrs = Math.floor(totalMinutes / 60);
+    let mins = totalMinutes % 60;
+    
+    let parts = [];
+    if (hrs > 0) parts.push(`${hrs}h`);
+    if (mins > 0) parts.push(`${mins}m`);
+    return parts.join(' ');
 }
 
 function renderConfig(roll, branch, track) {
     const configArea = document.getElementById('configArea');
-    let html = '';
+    const sidebarConfigArea = document.getElementById('sidebarConfigArea');
+    let mainHtml = '';
+    let sidebarHtml = '';
 
     if (branch !== 'ES') {
         const savedElective = localStorage.getItem('elective_' + roll) || '';
-        html += `
-        <div class="config-card">
-            <h4>HSS Elective (HS21XX slot)</h4>
-            <p>This semester's HSS elective slot isn't tied to specific students in the source timetable, so pick the one you're actually enrolled in — it'll be remembered on this device.</p>
-            <select onchange="setElective('${roll}', this.value)">
-                <option value="">— Select your elective —</option>
-                ${Object.keys(electiveOptions).map(code => `<option value="${code}" ${savedElective===code?'selected':''}>${code}</option>`).join('')}
-            </select>
+        const savedName = savedElective ? electiveOptions[savedElective].name : '— Select your elective —';
+        
+        const selectHtml = `
+            <div class="custom-select" onclick="this.classList.toggle('open')">
+                <div class="custom-select-btn">${savedElective ? savedElective + ' - ' + savedName : savedName}</div>
+                <div class="custom-select-options">
+                    <div class="custom-option ${savedElective===''?'selected':''}" onclick="setElective('${roll}', '')">— Select your elective —</div>
+                    ${Object.keys(electiveOptions).map(code => `
+                        <div class="custom-option ${savedElective===code?'selected':''}" onclick="setElective('${roll}', '${code}')">
+                            ${code} - ${electiveOptions[code].name}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>`;
+            
+        sidebarHtml += `
+        <div style="margin-bottom: 20px;">
+            <h4 style="color: var(--accent); margin: 0 0 8px; font-size: 0.85rem; text-transform: uppercase;">HSS Elective</h4>
+            ${selectHtml}
         </div>`;
+
+        if (!savedElective) {
+            mainHtml += `
+            <div class="config-card">
+                <h4>HSS Elective (HS21XX slot)</h4>
+                <p>This semester's HSS elective slot isn't tied to specific students in the source timetable, so pick the one you're actually enrolled in — it'll be remembered on this device.</p>
+                ${selectHtml}
+            </div>`;
+        }
     }
 
     if (eeFamilyBranches.includes(branch)) {
         const savedGroup = localStorage.getItem('labgroup_' + roll) || '';
-        html += `
-        <div class="config-card">
-            <h4>EC2101/EE2101 Practical Batch</h4>
-            <p>This practical runs as rotating batches (G1/G2/G3) with no student-batch list in the source timetable. Pick your batch to see the right lab days.</p>
-            <select onchange="setLabGroup('${roll}', this.value)">
-                <option value="">— Select your batch —</option>
-                ${Object.keys(labGroupOptions).map(g => `<option value="${g}" ${savedGroup===g?'selected':''}>${g}</option>`).join('')}
-            </select>
+        
+        const labSelectHtml = `
+            <div class="custom-select" onclick="this.classList.toggle('open')">
+                <div class="custom-select-btn">${savedGroup || '— Select your batch —'}</div>
+                <div class="custom-select-options">
+                    <div class="custom-option ${savedGroup===''?'selected':''}" onclick="setLabGroup('${roll}', '')">— Select your batch —</div>
+                    ${Object.keys(labGroupOptions).map(g => `
+                        <div class="custom-option ${savedGroup===g?'selected':''}" onclick="setLabGroup('${roll}', '${g}')">${g}</div>
+                    `).join('')}
+                </div>
+            </div>`;
+            
+        sidebarHtml += `
+        <div style="margin-bottom: 20px;">
+            <h4 style="color: var(--accent); margin: 0 0 8px; font-size: 0.85rem; text-transform: uppercase;">Practical Batch</h4>
+            ${labSelectHtml}
         </div>`;
+
+        if (!savedGroup) {
+            mainHtml += `
+            <div class="config-card">
+                <h4>EC2101/EE2101 Practical Batch</h4>
+                <p>This practical runs as rotating batches (G1/G2/G3) with no student-batch list in the source timetable. Pick your batch to see the right lab days.</p>
+                ${labSelectHtml}
+            </div>`;
+        }
     }
 
-    configArea.innerHTML = html;
+    configArea.innerHTML = mainHtml;
+    if (sidebarHtml) {
+        sidebarConfigArea.innerHTML = sidebarHtml;
+    } else {
+        sidebarConfigArea.innerHTML = `<p style="color: var(--text-dim); font-size: 0.9rem;">No settings available for this branch.</p>`;
+    }
 }
 
 function setElective(roll, code) {
@@ -359,8 +558,10 @@ function renderSchedule(name, roll) {
     }
     const elective = localStorage.getItem('elective_' + roll);
     if (elective && electiveOptions[elective]) {
+        const fullElectiveName = electiveOptions[elective].name;
+        const cleanName = fullElectiveName.includes('-') ? fullElectiveName.split('-').slice(1).join('-').trim() : fullElectiveName;
         electiveOptions[elective].sessions.forEach(sess => {
-            allSessions.push({ code: elective, name: elective + ' (Elective)', day: sess.day, time: sess.time, room: sess.room, type: 'Elective' });
+            allSessions.push({ code: elective, name: cleanName, day: sess.day, time: sess.time, room: sess.room, type: 'Elective' });
         });
     }
     const labGroup = localStorage.getItem('labgroup_' + roll);
@@ -383,20 +584,26 @@ function renderSchedule(name, roll) {
         const isToday = (day === today);
         let classes = allSessions.filter(c => c.day === day);
         classes.sort((a, b) => parseTime(a.time) - parseTime(b.time));
+        
+        let totalHours = calculateTotalHours(classes);
+        let totalHoursBadge = totalHours ? `<span style="font-size: 0.75rem; font-weight: 600; color: var(--text-dim); margin-left: 10px; text-transform: none;">Total: ${totalHours}</span>` : '';
 
         html += `
             <div class="day-card ${isToday ? 'is-today' : ''}">
                 <div class="day-header">
-                    <h3>${day}</h3>
+                    <h3 style="display:flex; align-items:center;">${day} ${totalHoursBadge}</h3>
                     <span class="status-badge">${isToday ? 'TODAY' : 'WEEKDAY'}</span>
                 </div>
                 <div>
-                    ${classes.length > 0 ? classes.map(c => `
+                    ${classes.length > 0 ? classes.map(c => {
+                        const nameDisplay = c.name && c.name !== c.code ? ` — ${c.name}` : '';
+                        return `
                         <div class="class-row">
                             <span class="time">${c.time}</span>
-                            <span class="course-name">${c.code} — ${c.name}<span class="type-badge type-${c.type}">${c.type}</span></span>
+                            <span class="course-name">${c.code}${nameDisplay}<span class="type-badge type-${c.type}">${c.type}</span></span>
                             <span class="room-tag">📍 ${c.room}</span>
-                        </div>`).join('') : '<div style="padding:40px; color:#555; text-align:center;">No classes today.</div>'}
+                        </div>`;
+                    }).join('') : '<div style="padding:40px; color:#555; text-align:center;">No classes today.</div>'}
                 </div>
             </div>`;
     });
