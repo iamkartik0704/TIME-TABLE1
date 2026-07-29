@@ -14,6 +14,12 @@ const trackCourses = {
         "type": "Lecture"
       },
       {
+        "day": "Tuesday",
+        "time": "3 PM - 3.55 PM",
+        "room": "R-103",
+        "type": "Lecture"
+      },
+      {
         "day": "Thursday",
         "time": "3 PM - 3.55 PM",
         "room": "R-103",
@@ -36,6 +42,12 @@ const trackCourses = {
       {
         "day": "Tuesday",
         "time": "3 PM - 3.55 PM",
+        "room": "R-103",
+        "type": "Lecture"
+      },
+      {
+        "day": "Tuesday",
+        "time": "4 PM - 4.55 PM",
         "room": "R-103",
         "type": "Lecture"
       }
@@ -152,30 +164,6 @@ const trackCourses = {
         "time": "11 AM - 11.55 AM",
         "room": "LT102",
         "type": "Lecture"
-      },
-      {
-        "day": "Thursday",
-        "time": "4-5 PM",
-        "room": "LT102",
-        "type": "Lecture"
-      },
-      {
-        "day": "Friday",
-        "time": "4-5 PM",
-        "room": "LT102",
-        "type": "Lecture"
-      },
-      {
-        "day": "Thursday",
-        "time": "5-6 PM",
-        "room": "LT102",
-        "type": "Lecture"
-      },
-      {
-        "day": "Friday",
-        "time": "5-6 PM",
-        "room": "LT102",
-        "type": "Lecture"
       }
     ],
     "EE2103": [
@@ -208,30 +196,6 @@ const trackCourses = {
         "time": "12 Noon - 12.55 PM",
         "room": "LT102",
         "type": "Lecture"
-      },
-      {
-        "day": "Monday",
-        "time": "4-5 PM",
-        "room": "R-310",
-        "type": "Lecture"
-      },
-      {
-        "day": "Tuesday",
-        "time": "4-5 PM",
-        "room": "R-109",
-        "type": "Lecture"
-      },
-      {
-        "day": "Monday",
-        "time": "5-6 PM",
-        "room": "R-310",
-        "type": "Lecture"
-      },
-      {
-        "day": "Tuesday",
-        "time": "5-6 PM",
-        "room": "R-109",
-        "type": "Lecture"
       }
     ],
     "EC2102": [
@@ -246,6 +210,12 @@ const trackCourses = {
         "time": "3 PM - 3.55 PM",
         "room": "LT102",
         "type": "Lecture"
+      },
+      {
+        "day": "Tuesday",
+        "time": "3 PM - 3.55 PM",
+        "room": "LT102",
+        "type": "Tutorial"
       },
       {
         "day": "Thursday",
@@ -272,30 +242,6 @@ const trackCourses = {
         "time": "12 Noon - 12.55 PM",
         "room": "EED R129",
         "type": "Lecture"
-      },
-      {
-        "day": "Monday",
-        "time": "4-5 PM",
-        "room": "R-109",
-        "type": "Lecture"
-      },
-      {
-        "day": "Tuesday",
-        "time": "4-5 PM",
-        "room": "LT102",
-        "type": "Lecture"
-      },
-      {
-        "day": "Monday",
-        "time": "5-6 PM",
-        "room": "R-109",
-        "type": "Lecture"
-      },
-      {
-        "day": "Tuesday",
-        "time": "5-6 PM",
-        "room": "LT102",
-        "type": "Lecture"
       }
     ]
   },
@@ -315,6 +261,12 @@ const trackCourses = {
       },
       {
         "day": "Tuesday",
+        "time": "9 AM - 9.55 AM",
+        "room": "R-104",
+        "type": "Lecture"
+      },
+      {
+        "day": "Tuesday",
         "time": "11 AM - 11.55 AM",
         "room": "R-104",
         "type": "Lecture"
@@ -323,18 +275,6 @@ const trackCourses = {
         "day": "Tuesday",
         "time": "12 Noon - 12.55 PM",
         "room": "R-104",
-        "type": "Lecture"
-      },
-      {
-        "day": "Monday",
-        "time": "4-5 PM",
-        "room": "R-106",
-        "type": "Lecture"
-      },
-      {
-        "day": "Monday",
-        "time": "5-6 PM",
-        "room": "R-106",
         "type": "Lecture"
       }
     ],
@@ -372,6 +312,12 @@ const trackCourses = {
         "type": "Lab"
       },
       {
+        "day": "Tuesday",
+        "time": "11 AM - 11.55 AM",
+        "room": "R-104",
+        "type": "Lecture"
+      },
+      {
         "day": "Friday",
         "time": "12 Noon - 12.55 PM",
         "room": "R-104",
@@ -380,18 +326,6 @@ const trackCourses = {
       {
         "day": "Monday",
         "time": "3 PM - 3.55 PM",
-        "room": "R102",
-        "type": "Lecture"
-      },
-      {
-        "day": "Tuesday",
-        "time": "4-5 PM",
-        "room": "R102",
-        "type": "Lecture"
-      },
-      {
-        "day": "Tuesday",
-        "time": "5-6 PM",
         "room": "R102",
         "type": "Lecture"
       }
@@ -404,6 +338,12 @@ const trackCourses = {
         "type": "Lab"
       },
       {
+        "day": "Tuesday",
+        "time": "8 AM - 8.55 AM",
+        "room": "R-104",
+        "type": "Lecture"
+      },
+      {
         "day": "Thursday",
         "time": "8 AM - 8.55 AM",
         "room": "R-104",
@@ -413,24 +353,6 @@ const trackCourses = {
         "day": "Tuesday",
         "time": "3 PM - 3.55 PM",
         "room": "R102",
-        "type": "Lecture"
-      },
-      {
-        "day": "Friday",
-        "time": "8-9 AM",
-        "room": "R-106",
-        "type": "Lecture"
-      },
-      {
-        "day": "Friday",
-        "time": "9-10 AM",
-        "room": "R-106",
-        "type": "Lecture"
-      },
-      {
-        "day": "Friday",
-        "time": "10-11 AM",
-        "room": "R-106",
         "type": "Lecture"
       }
     ]
@@ -562,6 +484,12 @@ const trackCourses = {
         "time": "9 AM - 9.55 AM",
         "room": "LT002",
         "type": "Lecture"
+      },
+      {
+        "day": "Tuesday",
+        "time": "3 PM - 3.55 PM",
+        "room": "R-308",
+        "type": "Tutorial"
       }
     ],
     "ME2102": [
@@ -602,6 +530,12 @@ const trackCourses = {
         "type": "Lecture"
       },
       {
+        "day": "Tuesday",
+        "time": "5 PM - 5.55 PM",
+        "room": "R-301",
+        "type": "Lecture"
+      },
+      {
         "day": "Friday",
         "time": "5 PM - 5.55 PM",
         "room": "R-301",
@@ -638,6 +572,12 @@ const trackCourses = {
         "time": "12 Noon - 12.55 PM",
         "room": "LT002",
         "type": "Lecture"
+      },
+      {
+        "day": "Tuesday",
+        "time": "4 PM - 4.55 PM",
+        "room": "LT002",
+        "type": "Lecture"
       }
     ],
     "ME2104": [
@@ -670,30 +610,6 @@ const trackCourses = {
         "time": "5 PM - 5.55 PM",
         "room": "LT002",
         "type": "Lecture"
-      },
-      {
-        "day": "Thursday",
-        "time": "3-4 PM",
-        "room": "LT002",
-        "type": "Lecture"
-      },
-      {
-        "day": "Monday",
-        "time": "4-5 PM",
-        "room": "R-301",
-        "type": "Lecture"
-      },
-      {
-        "day": "Thursday",
-        "time": "4-5 PM",
-        "room": "LT002",
-        "type": "Lecture"
-      },
-      {
-        "day": "Monday",
-        "time": "5-6 PM",
-        "room": "R-301",
-        "type": "Lecture"
       }
     ]
   },
@@ -706,6 +622,12 @@ const trackCourses = {
         "type": "Lab"
       },
       {
+        "day": "Tuesday",
+        "time": "3 PM - 3.55 PM",
+        "room": "R-102",
+        "type": "Lecture"
+      },
+      {
         "day": "Friday",
         "time": "3 PM - 3.55 PM",
         "room": "R-102",
@@ -713,6 +635,12 @@ const trackCourses = {
       },
       {
         "day": "Monday",
+        "time": "4 PM - 4.55 PM",
+        "room": "R-102",
+        "type": "Lecture"
+      },
+      {
+        "day": "Tuesday",
         "time": "4 PM - 4.55 PM",
         "room": "R-102",
         "type": "Lecture"
@@ -724,6 +652,12 @@ const trackCourses = {
         "time": "10 AM - 12.55 Noon",
         "room": "Lab",
         "type": "Lab"
+      },
+      {
+        "day": "Tuesday",
+        "time": "10 AM - 10.55 AM",
+        "room": "R-307",
+        "type": "Lecture"
       },
       {
         "day": "Monday",
@@ -739,6 +673,18 @@ const trackCourses = {
       }
     ],
     "CB2105": [
+      {
+        "day": "Tuesday",
+        "time": "9 AM - 9.55 AM",
+        "room": "R-102",
+        "type": "Lecture"
+      },
+      {
+        "day": "Tuesday",
+        "time": "9 AM - 9.55 AM",
+        "room": "R-307",
+        "type": "Lecture"
+      },
       {
         "day": "Friday",
         "time": "4 PM - 4.55 PM",
@@ -764,9 +710,28 @@ const trackCourses = {
         "time": "4 PM - 4.55 PM",
         "room": "R-102",
         "type": "Lecture"
+      },
+      {
+        "day": "Tuesday",
+        "time": "5 PM - 5.55 PM",
+        "room": "R-102",
+        "type": "Lecture"
       }
     ],
-    "CB2101": []
+    "CB2101": [
+      {
+        "day": "Tuesday",
+        "time": "3 PM - 3.55 PM",
+        "room": "R-102",
+        "type": "Lecture"
+      },
+      {
+        "day": "Tuesday",
+        "time": "4 PM - 4.55 PM",
+        "room": "R-102",
+        "type": "Lecture"
+      }
+    ]
   },
   "CHEM": {
     "CH2104": [
@@ -777,26 +742,20 @@ const trackCourses = {
         "type": "Lab"
       },
       {
+        "day": "Tuesday",
+        "time": "3 PM - 4.55 PM",
+        "room": "R-102     CBE",
+        "type": "Lecture"
+      },
+      {
         "day": "Friday",
-        "time": "03:00 - 03:55",
+        "time": "3 PM - 3.55 PM",
         "room": "R-102",
         "type": "Lecture"
       },
       {
         "day": "Monday",
-        "time": "04:00 - 04:55",
-        "room": "R-102",
-        "type": "Lecture"
-      },
-      {
-        "day": "Friday",
-        "time": "10:00 - 11:00",
-        "room": "R-102",
-        "type": "Lecture"
-      },
-      {
-        "day": "Friday",
-        "time": "11:00 - 12:00",
+        "time": "4 PM - 4.55 PM",
         "room": "R-102",
         "type": "Lecture"
       }
@@ -804,25 +763,25 @@ const trackCourses = {
     "CH2103": [
       {
         "day": "Friday",
-        "time": "09:00 - 09:55",
+        "time": "9 AM - 9.55 AM",
         "room": "R-305",
         "type": "Lecture"
       },
       {
         "day": "Friday",
-        "time": "04:00 - 04:55",
+        "time": "4 PM - 4.55 PM",
         "room": "R-305",
         "type": "Lecture"
       },
       {
         "day": "Monday",
-        "time": "05:00 - 05:55",
+        "time": "5 PM - 5.55 PM",
         "room": "R-306",
         "type": "Lecture"
       },
       {
         "day": "Thursday",
-        "time": "05:00 - 05:55",
+        "time": "5 PM - 5.55 PM",
         "room": "R-305",
         "type": "Lecture"
       }
@@ -830,33 +789,45 @@ const trackCourses = {
     "CH2105": [
       {
         "day": "Tuesday",
-        "time": "10:00 - 10.55",
+        "time": "10 AM - 10.55 AM",
         "room": "R-102",
         "type": "Lecture"
       },
       {
         "day": "Thursday",
-        "time": "03:00 - 03:55",
+        "time": "3 PM - 4.55 PM",
         "room": "R-102",
         "type": "Lecture"
       },
       {
-        "day": "Thursday",
-        "time": "04:00 - 04:55",
-        "room": "R-102",
+        "day": "Tuesday",
+        "time": "5 PM - 5.55 PM",
+        "room": "R-102     CBE",
         "type": "Lecture"
       }
     ],
     "CH2101": [
       {
         "day": "Tuesday",
-        "time": "04:00 - 04:55",
+        "time": "9 AM - 9.55 AM",
+        "room": "R-306",
+        "type": "Lecture"
+      },
+      {
+        "day": "Tuesday",
+        "time": "10 AM - 10.55 AM",
+        "room": "R-306",
+        "type": "Lecture"
+      },
+      {
+        "day": "Tuesday",
+        "time": "4 PM - 4.55 PM",
         "room": "R-305",
         "type": "Lecture"
       },
       {
         "day": "Friday",
-        "time": "05:00 - 05:55",
+        "time": "5 PM - 5.55 PM",
         "room": "R-305",
         "type": "Lecture"
       }
@@ -864,19 +835,25 @@ const trackCourses = {
     "CH2102": [
       {
         "day": "Thursday",
-        "time": "10:00 - 10.55",
+        "time": "10 AM - 10.55 AM",
+        "room": "R-306",
+        "type": "Lecture"
+      },
+      {
+        "day": "Tuesday",
+        "time": "11 AM - 11.55 AM",
         "room": "R-306",
         "type": "Lecture"
       },
       {
         "day": "Thursday",
-        "time": "11:00 - 11:55",
+        "time": "11 AM - 11.55 AM",
         "room": "R-306",
         "type": "Lecture"
       },
       {
         "day": "Friday",
-        "time": "12:00 - 12:55",
+        "time": "12 Noon - 12.55 PM",
         "room": "R-306",
         "type": "Lecture"
       }
@@ -919,6 +896,12 @@ const trackCourses = {
       {
         "day": "Friday",
         "time": "9 AM - 9.55 AM",
+        "room": "R-107",
+        "type": "Lecture"
+      },
+      {
+        "day": "Tuesday",
+        "time": "12 Noon - 12.55 PM",
         "room": "R-107",
         "type": "Lecture"
       }
@@ -994,6 +977,12 @@ const trackCourses = {
   "MME": {
     "MM2103": [
       {
+        "day": "Tuesday",
+        "time": "9 AM - 9.55 AM",
+        "room": "Rooms are in bracket",
+        "type": "Lecture"
+      },
+      {
         "day": "Thursday",
         "time": "9 AM - 9.55 AM",
         "room": "R-108",
@@ -1038,12 +1027,24 @@ const trackCourses = {
         "time": "12 Noon - 12.55 PM",
         "room": "R-108",
         "type": "Lecture"
+      },
+      {
+        "day": "Tuesday",
+        "time": "3 PM - 3.55 PM",
+        "room": "Rooms are in bracket",
+        "type": "Lecture"
       }
     ],
     "MM2102": [
       {
         "day": "Thursday",
         "time": "12 Noon - 12.55 PM",
+        "room": "R-108",
+        "type": "Lecture"
+      },
+      {
+        "day": "Tuesday",
+        "time": "4 PM - 4.55 PM",
         "room": "R-108",
         "type": "Lecture"
       },
@@ -1080,128 +1081,5 @@ const trackCourses = {
         "type": "Lecture"
       }
     ]
-  },
-  "HSS": {
-    "MA2102": [
-      {
-        "day": "Monday",
-        "time": "8 AM - 8.55 AM",
-        "room": "B1/202",
-        "type": "Tutorial"
-      },
-      {
-        "day": "Tuesday",
-        "time": "9 AM - 9.55 AM",
-        "room": "B1/202",
-        "type": "Lecture"
-      },
-      {
-        "day": "Thursday",
-        "time": "10 AM - 10.55 AM",
-        "room": "B1/202",
-        "type": "Lecture"
-      },
-      {
-        "day": "Friday",
-        "time": "11 AM - 11.55 AM",
-        "room": "B1/202",
-        "type": "Lecture"
-      }
-    ],
-    "HS2103": [
-      {
-        "day": "Thursday",
-        "time": "9 AM - 9.55 AM",
-        "room": "B1/202",
-        "type": "Lecture"
-      },
-      {
-        "day": "Monday",
-        "time": "10 AM - 10.55 AM",
-        "room": "B1/202",
-        "type": "Lecture"
-      },
-      {
-        "day": "Tuesday",
-        "time": "10 AM - 10.55 AM",
-        "room": "B1/202",
-        "type": "Lecture"
-      }
-    ],
-    "HS2101": [
-      {
-        "day": "Friday",
-        "time": "10 AM - 10.55 AM",
-        "room": "B1/202",
-        "type": "Lecture"
-      },
-      {
-        "day": "Monday",
-        "time": "3 PM - 3.55 PM",
-        "room": "B1/202",
-        "type": "Lecture"
-      },
-      {
-        "day": "Friday",
-        "time": "3 PM - 3.55 PM",
-        "room": "B1/202",
-        "type": "Tutorial"
-      }
-    ],
-    "HS2102": [
-      {
-        "day": "Monday",
-        "time": "11 AM - 11.55 AM",
-        "room": "B1/202",
-        "type": "Tutorial"
-      },
-      {
-        "day": "Tuesday",
-        "time": "11 AM - 11.55 AM",
-        "room": "B1/202",
-        "type": "Lecture"
-      },
-      {
-        "day": "Thursday",
-        "time": "11 AM - 11.55 AM",
-        "room": "B1/202",
-        "type": "Lecture"
-      }
-    ],
-    "HS2108": [
-      {
-        "day": "Tuesday",
-        "time": "12 Noon - 12.55 PM",
-        "room": "B1/202",
-        "type": "Lecture"
-      },
-      {
-        "day": "Thursday",
-        "time": "12 Noon - 12.55 PM",
-        "room": "B1/202",
-        "type": "Lecture"
-      },
-      {
-        "day": "Friday",
-        "time": "12 Noon - 12.55 PM",
-        "room": "B1/202",
-        "type": "Lecture"
-      }
-    ],
-    "HS2104": [
-      {
-        "day": "Tuesday",
-        "time": "4 PM - 4.55 PM",
-        "room": "B1/202",
-        "type": "Lecture"
-      },
-      {
-        "day": "Thursday",
-        "time": "4 PM - 4.55 PM",
-        "room": "B1/202",
-        "type": "Lecture"
-      }
-    ]
   }
 };
-
